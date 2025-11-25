@@ -5,6 +5,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
   OneToMany,
+  OneToOne,
 } from 'typeorm';
 import { RefreshToken } from './refresh-token.entity';
 
@@ -64,5 +65,9 @@ export class User {
 
   @OneToMany(() => RefreshToken, (refreshToken) => refreshToken.user)
   refreshTokens: RefreshToken[];
+
+  // UserProfile relationship (using string reference to avoid circular dependency)
+  @OneToOne('UserProfile', 'user', { nullable: true })
+  userProfile?: any;
 }
 
