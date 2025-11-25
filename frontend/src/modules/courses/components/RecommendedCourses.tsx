@@ -1,47 +1,70 @@
+"use client";
+
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Star, ArrowRight } from "lucide-react";
-
-const recommendedCourses = [
-  {
-    id: 1,
-    title: "Water Management Basics",
-    instructor: "Dr. Sarah Johnson",
-    rating: 4.9,
-    reviews: 234,
-    price: "Free",
-    badges: ["New", "Free"],
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=250&fit=crop",
-  },
-  {
-    id: 2,
-    title: "Soil Science Fundamentals",
-    instructor: "Prof. Michael Chen",
-    rating: 4.8,
-    reviews: 189,
-    price: "ETB 500",
-    badges: ["Popular"],
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=250&fit=crop",
-  },
-  {
-    id: 3,
-    title: "Livestock Management Pro",
-    instructor: "Dr. Ahmed Hassan",
-    rating: 4.9,
-    reviews: 312,
-    price: "ETB 750",
-    badges: ["Trending"],
-    image: "https://images.unsplash.com/photo-1625246333195-78d9c38ad449?w=400&h=250&fit=crop",
-  },
-];
+import { coursesApi, Course } from "../api/courses.api";
 
 export default function RecommendedCourses() {
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadRecommendedCourses();
+  }, []);
+
+  const loadRecommendedCourses = async () => {
+    try {
+      setLoading(true);
+      const data = await coursesApi.getAll({ status: "PUBLISHED" });
+      // Get top 3 courses by rating or enrollments
+      const sorted = data
+        .sort((a, b) => (b.averageRating || 0) - (a.averageRating || 0))
+        .slice(0, 3);
+      setCourses(sorted);
+    } catch (error: any) {
+      console.error("Failed to load recommended courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-32">
+        <div className="w-6 h-6 border-4 border-[#01BC63] border-t-transparent rounded-full animate-spin" />
+      </div>
+    );
+  }
+
+  if (courses.length === 0) {
+    return null;
+  }
+
+  const recommendedCourses = courses.map((course) => ({
+    id: course.id,
+    title: course.title,
+    instructor: `${course.creator.firstName} ${course.creator.lastName}`,
+    rating: course.averageRating,
+    reviews: course.totalReviews,
+    price: course.price > 0 ? `ETB ${course.price}` : "Free",
+    badges:
+      course.price === 0
+        ? ["Free"]
+        : course.totalEnrollments > 100
+        ? ["Popular"]
+        : [],
+    image: course.thumbnail || "/placeholder-course.jpg",
+  }));
   return (
     <div>
       <div className="flex justify-between items-center mb-6">
-        <h2 className="text-2xl font-bold text-gray-800">Recommended for You</h2>
+        <h2 className="text-2xl font-bold text-gray-800">
+          Recommended for You
+        </h2>
         <Link
           href="/courses"
-          className="text-primary hover:underline flex items-center gap-1"
+          className="text-[#01BC63] hover:underline flex items-center gap-1"
         >
           Browse All
           <ArrowRight className="w-4 h-4" />
@@ -85,7 +108,9 @@ export default function RecommendedCourses() {
               <div className="flex items-center justify-between mb-3">
                 <div className="flex items-center">
                   <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                  <span className="text-sm font-semibold ml-1">{course.rating}</span>
+                  <span className="text-sm font-semibold ml-1">
+                    {course.rating}
+                  </span>
                   <span className="text-xs text-gray-500 ml-1">
                     ({course.reviews} reviews)
                   </span>
@@ -105,4 +130,3 @@ export default function RecommendedCourses() {
     </div>
   );
 }
-

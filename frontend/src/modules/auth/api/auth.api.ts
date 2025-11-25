@@ -1,83 +1,68 @@
-// Mock API functions for authentication
-// These will be replaced with actual API calls when backend is ready
+import { apiClient } from '@/lib/api';
 
-export interface LoginRequest {
+export interface RegisterDto {
   email: string;
   password: string;
+  firstName?: string;
+  lastName?: string;
+  role: 'LEARNER' | 'CREATOR' | 'ADMIN';
 }
 
-export interface RegisterRequest {
+export interface LoginDto {
   email: string;
   password: string;
-  fullName: string;
-  phoneNumber?: string;
-  role: "LEARNER" | "CREATOR" | "ADMIN";
-  organization?: string;
-  bio?: string;
-  language?: "en" | "am";
 }
 
 export interface AuthResponse {
+  accessToken?: string;
+  access_token?: string;
+  refreshToken?: string;
+  refresh_token?: string;
   user: {
     id: string;
     email: string;
-    name: string;
+    firstName?: string;
+    lastName?: string;
     role: string;
   };
-  token: string;
 }
 
 export const authApi = {
-  login: async (data: LoginRequest): Promise<AuthResponse> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: "1",
-            email: data.email,
-            name: "John Doe",
-            role: "LEARNER",
-          },
-          token: "mock-jwt-token",
-        });
-      }, 1000);
-    });
+  register: async (data: RegisterDto): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/register', data);
+    const token = response.accessToken || response.access_token;
+    if (token) apiClient.setToken(token);
+    return response;
   },
 
-  register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: "1",
-            email: data.email,
-            name: data.fullName,
-            role: data.role,
-          },
-          token: "mock-jwt-token",
-        });
-      }, 1000);
-    });
+  login: async (data: LoginDto): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/login', data);
+    const token = response.accessToken || response.access_token;
+    if (token) apiClient.setToken(token);
+    return response;
   },
 
-  forgotPassword: async (email: string): Promise<void> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
-    });
+  logout: async (): Promise<void> => {
+    await apiClient.post('/auth/logout', {});
+    apiClient.setToken(null);
   },
 
-  resetPassword: async (token: string, newPassword: string): Promise<void> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
+  refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
+    const response = await apiClient.post<AuthResponse>('/auth/refresh', {
+      refreshToken,
     });
+    apiClient.setToken(response.access_token);
+    return response;
+  },
+
+  forgotPassword: async (email: string): Promise<{ message: string }> => {
+    return apiClient.post('/auth/forgot-password', { email });
+  },
+
+  resetPassword: async (
+    token: string,
+    password: string,
+  ): Promise<{ message: string }> => {
+    return apiClient.post('/auth/reset-password', { token, password });
   },
 };
-

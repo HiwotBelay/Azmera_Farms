@@ -1,39 +1,45 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Filter, Star, Clock } from "lucide-react";
 import CourseCard from "./CourseCard";
-
-// Mock data
-const courses = [
-  {
-    id: 1,
-    title: "Modern Greenhouse Farming",
-    description: "Learn advanced greenhouse techniques for year-round production",
-    instructor: "Dr. Alemayehu Tadesse",
-    rating: 4.9,
-    reviews: 234,
-    price: 49,
-    duration: "8 weeks",
-    lessons: 32,
-    category: "Crop Production",
-    level: "Intermediate",
-    language: "English",
-    image: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=250&fit=crop",
-  },
-  // Add more mock courses as needed
-];
+import { coursesApi, Course } from "../api/courses.api";
 
 export default function CourseListing() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadCourses();
+  }, [searchQuery]);
+
+  const loadCourses = async () => {
+    try {
+      setLoading(true);
+      const data = await coursesApi.getAll({
+        status: "PUBLISHED",
+        search: searchQuery || undefined,
+      });
+      setCourses(data);
+    } catch (error: any) {
+      console.error("Failed to load courses:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">Browse Courses</h1>
-        <p className="text-gray-600">Discover courses to enhance your agricultural skills</p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">
+          Browse Courses
+        </h1>
+        <p className="text-gray-600">
+          Discover courses to enhance your agricultural skills
+        </p>
       </div>
 
       {/* Search and Filters */}
@@ -57,12 +63,21 @@ export default function CourseListing() {
       </div>
 
       {/* Course Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-64">
+          <div className="w-8 h-8 border-4 border-[#01BC63] border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="text-center py-12">
+          <p className="text-gray-600">No courses found</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-
