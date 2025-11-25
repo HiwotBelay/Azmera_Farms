@@ -179,3 +179,4 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
     </div>
   );
 }
+

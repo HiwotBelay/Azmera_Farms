@@ -130,3 +130,4 @@ npm run dev
 - No backend integration yet
 - Components are designed based on Figma designs
 - Responsive design for mobile, tablet, and desktop
+

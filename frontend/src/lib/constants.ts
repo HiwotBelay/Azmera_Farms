@@ -24,3 +24,4 @@ export const LANGUAGES = {
   ENGLISH: "en",
   AMHARIC: "am",
 } as const;
+

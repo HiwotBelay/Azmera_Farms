@@ -36,3 +36,4 @@ export interface Enrollment {
   enrolledAt: string;
   progress: number;
 }
+
