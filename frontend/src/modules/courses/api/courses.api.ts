@@ -80,10 +80,32 @@ export interface FilterCoursesDto {
 
 export const coursesApi = {
   getAll: async (filters?: FilterCoursesDto) => {
-    const response = await apiClient.instance.get<{ courses: Course[]; total: number }>('/courses', {
-      params: filters,
-    });
-    return response.data;
+    console.log('🔍 coursesApi.getAll called with filters:', filters);
+    console.log('🔍 coursesApi.getAll - baseURL:', apiClient.instance.defaults.baseURL);
+    console.log('🔍 coursesApi.getAll - full URL will be:', `${apiClient.instance.defaults.baseURL}/courses`);
+    
+    try {
+      const response = await apiClient.instance.get<{ courses: Course[]; total: number }>('/courses', {
+        params: filters,
+      });
+      
+      console.log('✅ coursesApi.getAll response:', {
+        status: response.status,
+        data: response.data,
+        coursesCount: response.data?.courses?.length || 0,
+        total: response.data?.total || 0,
+      });
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ coursesApi.getAll error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url,
+      });
+      throw error;
+    }
   },
 
   getById: async (id: string) => {

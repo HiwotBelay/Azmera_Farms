@@ -14,6 +14,7 @@ import {
   Bell,
   LogOut,
   BarChart3,
+  List,
 } from "lucide-react";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
 
@@ -24,6 +25,7 @@ interface AdminDashboardLayoutProps {
 const adminNavigation = [
   { name: "Dashboard", href: "/admin/dashboard", icon: LayoutDashboard },
   { name: "Course Reviews", href: "/admin/courses", icon: BookOpen },
+  { name: "All Courses", href: "/admin/all-courses", icon: List },
   { name: "User Management", href: "/admin/users", icon: Users },
   { name: "Creator Applications", href: "/admin/applications", icon: FileText },
   { name: "Analytics", href: "/admin/analytics", icon: BarChart3 },

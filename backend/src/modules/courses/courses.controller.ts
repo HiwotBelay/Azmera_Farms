@@ -10,7 +10,9 @@ import {
   UseGuards,
   HttpCode,
   HttpStatus,
+  Req,
 } from '@nestjs/common';
+import { Request } from 'express';
 import { CoursesService } from './courses.service';
 import { CreateCourseDto } from './dto/create-course.dto';
 import { UpdateCourseDto } from './dto/update-course.dto';
@@ -42,11 +44,10 @@ export class CoursesController {
 
   @Get()
   @UseGuards(OptionalJwtAuthGuard)
-  async findAll(@Query() filterDto: FilterCoursesDto, @CurrentUser() user?: User) {
+  async findAll(@Query() filterDto: FilterCoursesDto, @CurrentUser() user?: User, @Req() req?: Request) {
     // Log for debugging
-    const request = arguments[0]?.req || arguments[1]?.req;
-    const authHeader = request?.headers?.authorization;
-    const rawStatus = request?.query?.status;
+    const authHeader = req?.headers?.authorization;
+    const rawStatus = req?.query?.status;
     
     // CRITICAL: Always check raw query param for PENDING status
     // This ensures we catch it even if DTO transformation fails
@@ -119,6 +120,14 @@ export class CoursesController {
   @HttpCode(HttpStatus.OK)
   async publish(@Param('id') id: string, @CurrentUser() user: User) {
     return this.coursesService.publish(id, user.id);
+  }
+
+  @Post(':id/accept')
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
+  @HttpCode(HttpStatus.OK)
+  async accept(@Param('id') id: string, @CurrentUser() user: User) {
+    return this.coursesService.accept(id, user.id);
   }
 
   @Post(':id/reject')

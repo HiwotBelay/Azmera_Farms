@@ -48,11 +48,21 @@ export class FilterCoursesDto {
   @IsOptional()
   isFree?: boolean;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) return undefined;
+    const num = typeof value === 'string' ? parseInt(value, 10) : Number(value);
+    return isNaN(num) ? undefined : num;
+  })
   @IsNumber()
   @Min(0)
   @IsOptional()
   page?: number;
 
+  @Transform(({ value }) => {
+    if (value === undefined || value === null) return undefined;
+    const num = typeof value === 'string' ? parseInt(value, 10) : Number(value);
+    return isNaN(num) ? undefined : num;
+  })
   @IsNumber()
   @Min(1)
   @IsOptional()

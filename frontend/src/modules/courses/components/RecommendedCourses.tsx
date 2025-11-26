@@ -28,9 +28,10 @@ export default function RecommendedCourses() {
     fetchRecommended();
   }, []);
 
-  const formatPrice = (price: number, isFree: boolean): string => {
+  const formatPrice = (price: number | string, isFree: boolean): string => {
     if (isFree) return 'Free';
-    return `ETB ${price.toFixed(2)}`;
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    return `ETB ${priceNum.toFixed(2)}`;
   };
 
   if (loading) {
@@ -80,7 +81,8 @@ export default function RecommendedCourses() {
           const badges = [];
           if (course.isFree) badges.push('Free');
           if (course.studentsCount > 100) badges.push('Popular');
-          if (course.rating >= 4.5) badges.push('Top Rated');
+          const ratingNum = typeof course.rating === 'string' ? parseFloat(course.rating) : (course.rating || 0);
+          if (ratingNum >= 4.5) badges.push('Top Rated');
 
           return (
             <div
@@ -118,7 +120,14 @@ export default function RecommendedCourses() {
                 <div className="flex items-center justify-between mb-3">
                   <div className="flex items-center">
                     <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-                    <span className="text-sm font-semibold ml-1">{course.rating.toFixed(1)}</span>
+                    <span className="text-sm font-semibold ml-1">
+                      {(() => {
+                        const rating = course.rating;
+                        if (rating === null || rating === undefined) return '0.0';
+                        const ratingNum = typeof rating === 'string' ? parseFloat(rating) : Number(rating);
+                        return isNaN(ratingNum) ? '0.0' : ratingNum.toFixed(1);
+                      })()}
+                    </span>
                     <span className="text-xs text-gray-500 ml-1">
                       ({course.reviewsCount} reviews)
                     </span>

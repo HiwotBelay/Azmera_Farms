@@ -11,9 +11,10 @@ export default function CourseCard({ course }: CourseCardProps) {
     ? `${course.creator.firstName || ''} ${course.creator.lastName || ''}`.trim() || course.creator.email
     : 'Unknown Instructor';
 
-  const formatPrice = (price: number, isFree: boolean): string => {
+  const formatPrice = (price: number | string, isFree: boolean): string => {
     if (isFree) return 'Free';
-    return `ETB ${price.toFixed(2)}`;
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    return `ETB ${priceNum.toFixed(2)}`;
   };
 
   const formatDuration = (minutes: number): string => {
@@ -41,7 +42,11 @@ export default function CourseCard({ course }: CourseCardProps) {
           )}
           <div className="absolute top-3 right-3 flex items-center bg-white/90 backdrop-blur-sm px-2 py-1 rounded-full">
             <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
-            <span className="text-sm font-semibold ml-1">{course.rating.toFixed(1)}</span>
+            <span className="text-sm font-semibold ml-1">
+              {typeof course.rating === 'string' 
+                ? parseFloat(course.rating).toFixed(1) 
+                : (course.rating || 0).toFixed(1)}
+            </span>
           </div>
         </div>
 

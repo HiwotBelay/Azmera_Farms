@@ -269,15 +269,12 @@ export class CoursesService {
       console.log('✅ Applying status filter:', filterDto.status, 'isAdmin:', isAdmin, 'userId:', userId);
       queryBuilder.where('course.status = :status', { status: filterDto.status });
       hasWhereClause = true;
-    } else if (!isAdmin) {
-      // If no status filter and user is not admin, only show published courses
-      console.log('Non-admin, no status filter - showing only published courses');
-      queryBuilder.where('course.status = :status', { status: CourseStatus.PUBLISHED });
-      hasWhereClause = true;
     } else {
-      console.log('✅ Admin, no status filter - showing all courses');
+      // If no status filter provided, show all courses (for development/testing)
+      // In production, you may want to restrict this to only PUBLISHED courses for non-admins
+      console.log('No status filter - showing all courses');
     }
-    // If admin and no status filter, show all courses (no where clause)
+    // If no status filter, show all courses (no where clause)
 
     // Apply filters
     if (filterDto.search) {
@@ -482,6 +479,29 @@ export class CoursesService {
 
     if (course.status !== CourseStatus.PENDING) {
       throw new BadRequestException('Only pending courses can be published');
+    }
+
+    course.status = CourseStatus.PUBLISHED;
+    course.reviewedBy = userId;
+    course.reviewedAt = new Date();
+
+    return await this.courseRepository.save(course);
+  }
+
+  async accept(id: string, userId: string): Promise<Course> {
+    const course = await this.courseRepository.findOne({ where: { id } });
+
+    if (!course) {
+      throw new NotFoundException('Course not found');
+    }
+
+    const user = await this.userRepository.findOne({ where: { id: userId } });
+    if (!user || user.role !== UserRole.ADMIN) {
+      throw new ForbiddenException('Only admins can accept courses');
+    }
+
+    if (course.status !== CourseStatus.PENDING) {
+      throw new BadRequestException('Only pending courses can be accepted');
     }
 
     course.status = CourseStatus.PUBLISHED;

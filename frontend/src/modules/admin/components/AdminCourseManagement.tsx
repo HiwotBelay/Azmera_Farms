@@ -83,18 +83,18 @@ export default function AdminCourseManagement() {
     await fetchAllCoursesWithFilter(filter);
   };
 
-  const handlePublish = async (courseId: string) => {
-    if (!confirm('Are you sure you want to publish this course? It will be visible to all users.')) {
+  const handleAccept = async (courseId: string) => {
+    if (!confirm('Are you sure you want to accept this course? It will be published and visible to all users.')) {
       return;
     }
 
     try {
       setProcessingId(courseId);
-      await adminApi.publishCourse(courseId);
+      await adminApi.acceptCourse(courseId);
       await fetchAllCourses();
-      alert('Course published successfully!');
+      alert('Course accepted and published successfully!');
     } catch (error: any) {
-      alert(error.response?.data?.message || 'Failed to publish course');
+      alert(error.response?.data?.message || 'Failed to accept course');
     } finally {
       setProcessingId(null);
     }
@@ -326,10 +326,10 @@ export default function AdminCourseManagement() {
                         {course.status === 'PENDING' && (
                           <>
                             <button
-                              onClick={() => handlePublish(course.id)}
+                              onClick={() => handleAccept(course.id)}
                               disabled={processingId === course.id}
                               className="text-green-600 hover:text-green-800 disabled:opacity-50"
-                              title="Publish"
+                              title="Accept Course"
                             >
                               <CheckCircle className="w-4 h-4" />
                             </button>
@@ -337,7 +337,7 @@ export default function AdminCourseManagement() {
                               onClick={() => setShowRejectModal(course.id)}
                               disabled={processingId === course.id}
                               className="text-red-600 hover:text-red-800 disabled:opacity-50"
-                              title="Reject"
+                              title="Reject Course"
                             >
                               <XCircle className="w-4 h-4" />
                             </button>

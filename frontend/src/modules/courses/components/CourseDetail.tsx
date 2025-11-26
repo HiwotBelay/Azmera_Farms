@@ -80,9 +80,10 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
     return `${mins}m`;
   };
 
-  const formatPrice = (price: number, isFree: boolean): string => {
+  const formatPrice = (price: number | string, isFree: boolean): string => {
     if (isFree) return 'Free';
-    return `ETB ${price.toFixed(2)}`;
+    const priceNum = typeof price === 'string' ? parseFloat(price) : price;
+    return `ETB ${priceNum.toFixed(2)}`;
   };
 
   if (loading) {
@@ -129,7 +130,11 @@ export default function CourseDetail({ courseId }: CourseDetailProps) {
             </div>
             <div className="flex items-center">
               <Star className="w-5 h-5 text-yellow-400 fill-yellow-400" />
-              <span className="ml-1 font-semibold">{course.rating.toFixed(1)}</span>
+              <span className="ml-1 font-semibold">
+                {typeof course.rating === 'string' 
+                  ? parseFloat(course.rating).toFixed(1) 
+                  : (course.rating || 0).toFixed(1)}
+              </span>
               <span className="text-gray-500 ml-1">({course.reviewsCount} reviews)</span>
             </div>
           </div>

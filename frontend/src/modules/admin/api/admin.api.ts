@@ -179,6 +179,11 @@ export const adminApi = {
     return response.data;
   },
 
+  acceptCourse: async (courseId: string): Promise<any> => {
+    const response = await apiClient.instance.post(`/courses/${courseId}/accept`);
+    return response.data;
+  },
+
   rejectCourse: async (courseId: string, rejectionReason: string): Promise<any> => {
     const response = await apiClient.instance.post(`/courses/${courseId}/reject`, {
       rejectionReason,
