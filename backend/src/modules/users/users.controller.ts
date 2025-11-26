@@ -13,11 +13,15 @@ import { UpdateProfileDto } from './dto/update-profile.dto';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { User } from '../auth/entities/user.entity';
+import { ProgressService } from '../courses/progress.service';
 
 @Controller('users')
 @UseGuards(JwtAuthGuard)
 export class UsersController {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly progressService: ProgressService,
+  ) {}
 
   @Get('profile')
   async getProfile(@CurrentUser() user: User) {
@@ -45,5 +49,12 @@ export class UsersController {
   async getUserStats(@CurrentUser() user: User) {
     return this.usersService.getUserStats(user.id);
   }
+
+  @Get('me/progress')
+  async getAllUserProgress(@CurrentUser() user: User) {
+    return this.progressService.getAllUserProgress(user.id);
+  }
 }
+
+
 

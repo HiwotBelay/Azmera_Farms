@@ -1,32 +1,41 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Search, Filter, Star, Clock } from "lucide-react";
 import CourseCard from "./CourseCard";
-
-// Mock data
-const courses = [
-  {
-    id: 1,
-    title: "Modern Greenhouse Farming",
-    description: "Learn advanced greenhouse techniques for year-round production",
-    instructor: "Dr. Alemayehu Tadesse",
-    rating: 4.9,
-    reviews: 234,
-    price: 49,
-    duration: "8 weeks",
-    lessons: 32,
-    category: "Crop Production",
-    level: "Intermediate",
-    language: "English",
-    image: "https://images.unsplash.com/photo-1593111774240-d529f12cf4bb?w=400&h=250&fit=crop",
-  },
-  // Add more mock courses as needed
-];
+import { coursesApi, Course } from "../api/courses.api";
 
 export default function CourseListing() {
   const [searchQuery, setSearchQuery] = useState("");
+  const [courses, setCourses] = useState<Course[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
+
+  useEffect(() => {
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await coursesApi.getAll({
+          search: searchQuery || undefined,
+          limit: 20,
+          page: 0,
+        });
+        setCourses(response.courses);
+        setTotal(response.total);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    const debounceTimer = setTimeout(() => {
+      fetchCourses();
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   return (
     <div>
@@ -56,13 +65,40 @@ export default function CourseListing() {
         </div>
       </div>
 
+      {/* Results Count */}
+      {!loading && (
+        <div className="mb-4 text-sm text-gray-600">
+          {total} {total === 1 ? 'course' : 'courses'} found
+        </div>
+      )}
+
       {/* Course Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {courses.map((course) => (
-          <CourseCard key={course.id} course={course} />
-        ))}
-      </div>
+      {loading ? (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse">
+              <div className="w-full h-48 bg-gray-200"></div>
+              <div className="p-4">
+                <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : courses.length === 0 ? (
+        <div className="bg-gray-50 rounded-xl p-8 text-center">
+          <p className="text-gray-600 mb-4">No courses found.</p>
+          {searchQuery && (
+            <p className="text-sm text-gray-500">Try adjusting your search terms.</p>
+          )}
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {courses.map((course) => (
+            <CourseCard key={course.id} course={course} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
-

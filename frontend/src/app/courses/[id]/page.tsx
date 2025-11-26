@@ -20,3 +20,5 @@ export default function CourseDetailPage({ params }: CourseDetailPageProps) {
   );
 }
 
+
+

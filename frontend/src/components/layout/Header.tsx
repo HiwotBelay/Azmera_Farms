@@ -1,12 +1,20 @@
 "use client";
 
 import Link from "next/link";
-import { Search, Globe, Menu, X } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Search, Globe, Menu, X, User, LogOut } from "lucide-react";
 import { useState } from "react";
 import Logo from "@/components/ui/Logo";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, isAuthenticated, logout } = useAuth();
+  const router = useRouter();
+
+  const handleLogout = async () => {
+    await logout();
+  };
 
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
@@ -51,18 +59,39 @@ export default function Header() {
               <span>English</span>
               <span>▼</span>
             </button>
-            <Link
-              href="/login"
-              className="px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition"
-            >
-              Login
-            </Link>
-            <Link
-              href="/register"
-              className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition whitespace-nowrap"
-            >
-              Sign Up
-            </Link>
+            {isAuthenticated && user ? (
+              <>
+                <Link
+                  href="/dashboard"
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-primary transition"
+                >
+                  <User className="w-4 h-4" />
+                  <span>{user.firstName || user.email.split('@')[0]}</span>
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center space-x-2 px-4 py-2 text-gray-700 hover:text-red-600 transition"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Logout</span>
+                </button>
+              </>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  className="px-4 py-2 text-primary border border-primary rounded-lg hover:bg-primary hover:text-white transition"
+                >
+                  Login
+                </Link>
+                <Link
+                  href="/register"
+                  className="px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition whitespace-nowrap"
+                >
+                  Sign Up
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -95,18 +124,39 @@ export default function Header() {
                   <Globe className="w-4 h-4" />
                   <span>English</span>
                 </button>
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-primary border border-primary rounded-lg"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
-                >
-                  Sign Up
-                </Link>
+                {isAuthenticated && user ? (
+                  <>
+                    <Link
+                      href="/dashboard"
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>{user.firstName || user.email.split('@')[0]}</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="px-4 py-2 text-primary border border-primary rounded-lg"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

@@ -4,6 +4,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from '../modules/auth/entities/user.entity';
 import { RefreshToken } from '../modules/auth/entities/refresh-token.entity';
 import { UserProfile } from '../modules/users/entities/user-profile.entity';
+import { CreatorApplication } from '../modules/admin/entities/creator-application.entity';
+import { Course } from '../modules/courses/entities/course.entity';
+import { Lesson } from '../modules/courses/entities/lesson.entity';
+import { Enrollment } from '../modules/courses/entities/enrollment.entity';
+import { Category } from '../modules/courses/entities/category.entity';
+import { LessonProgress } from '../modules/courses/entities/lesson-progress.entity';
+import { Media } from '../modules/media/entities/media.entity';
 
 @Module({
   imports: [
@@ -17,7 +24,18 @@ import { UserProfile } from '../modules/users/entities/user-profile.entity';
           return {
             type: 'postgres',
             url: databaseUrl,
-            entities: [User, RefreshToken, UserProfile],
+            entities: [
+              User,
+              RefreshToken,
+              UserProfile,
+              CreatorApplication,
+              Course,
+              Lesson,
+              Enrollment,
+              Category,
+              LessonProgress,
+              Media,
+            ],
             synchronize: configService.get('NODE_ENV') === 'development',
             logging: configService.get('NODE_ENV') === 'development',
             ssl: {

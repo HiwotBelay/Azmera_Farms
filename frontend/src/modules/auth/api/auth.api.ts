@@ -1,5 +1,4 @@
-// Mock API functions for authentication
-// These will be replaced with actual API calls when backend is ready
+import { apiClient } from '@/lib/api-client';
 
 export interface LoginRequest {
   email: string;
@@ -9,75 +8,89 @@ export interface LoginRequest {
 export interface RegisterRequest {
   email: string;
   password: string;
-  fullName: string;
-  phoneNumber?: string;
-  role: "LEARNER" | "CREATOR" | "ADMIN";
-  organization?: string;
-  bio?: string;
-  language?: "en" | "am";
+  firstName?: string;
+  lastName?: string;
+  role: 'LEARNER' | 'CREATOR' | 'ADMIN';
 }
 
 export interface AuthResponse {
   user: {
     id: string;
     email: string;
-    name: string;
+    firstName?: string;
+    lastName?: string;
     role: string;
+    isEmailVerified?: boolean;
+    isActive?: boolean;
   };
-  token: string;
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: "1",
-            email: data.email,
-            name: "John Doe",
-            role: "LEARNER",
-          },
-          token: "mock-jwt-token",
-        });
-      }, 1000);
-    });
+    const response = await apiClient.instance.post<AuthResponse>('/auth/login', data);
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    apiClient.setTokensPublic(accessToken, refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    return response.data;
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve({
-          user: {
-            id: "1",
-            email: data.email,
-            name: data.fullName,
-            role: data.role,
-          },
-          token: "mock-jwt-token",
-        });
-      }, 1000);
+    const response = await apiClient.instance.post<AuthResponse>('/auth/register', {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
     });
+    
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    apiClient.setTokensPublic(accessToken, refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    return response.data;
+  },
+
+  logout: async (): Promise<void> => {
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+      await apiClient.instance.post('/auth/logout', { refreshToken });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      apiClient.clearTokensPublic();
+    }
+  },
+
+  getMe: async (): Promise<AuthResponse['user']> => {
+    const response = await apiClient.instance.get<AuthResponse['user']>('/auth/me');
+    localStorage.setItem('user', JSON.stringify(response.data));
+    return response.data;
   },
 
   forgotPassword: async (email: string): Promise<void> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
-    });
+    await apiClient.instance.post('/auth/forgot-password', { email });
   },
 
   resetPassword: async (token: string, newPassword: string): Promise<void> => {
-    // Mock API call
-    return new Promise((resolve) => {
-      setTimeout(() => {
-        resolve();
-      }, 1000);
+    await apiClient.instance.post('/auth/reset-password', {
+      token,
+      newPassword,
     });
   },
-};
 
+  refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> => {
+    const response = await apiClient.instance.post<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
+      refreshToken,
+    });
+    
+    apiClient.setTokensPublic(response.data.accessToken, response.data.refreshToken);
+    return response.data;
+  },
+};

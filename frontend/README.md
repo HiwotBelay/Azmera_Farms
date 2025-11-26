@@ -131,3 +131,5 @@ npm run dev
 - Components are designed based on Figma designs
 - Responsive design for mobile, tablet, and desktop
 
+
+
