@@ -2,10 +2,19 @@
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { Search, Globe, Menu, X, ChevronDown, User, LogOut } from "lucide-react";
+import {
+  Search,
+  Globe,
+  Menu,
+  X,
+  ChevronDown,
+  User,
+  LogOut,
+} from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Logo from "@/components/ui/Logo";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -15,7 +24,10 @@ export default function Header() {
   const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
   const authRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
   const { user, isAuthenticated, logout } = useAuth();
+  const { t, locale, changeLocale } = useTranslation();
+  const [isLangDropdownOpen, setIsLangDropdownOpen] = useState(false);
 
   // Close search when clicking outside
   useEffect(() => {
@@ -28,6 +40,9 @@ export default function Header() {
       }
       if (authRef.current && !authRef.current.contains(event.target as Node)) {
         setIsAuthDropdownOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setIsLangDropdownOpen(false);
       }
     };
 
@@ -101,28 +116,28 @@ export default function Header() {
               onClick={(e) => handleNavClick("/", e)}
               className="px-5 py-2 text-gray-700 hover:text-primary transition rounded-full text-sm font-medium"
             >
-              Home
+              {t("common.welcome", "Home")}
             </a>
             <a
               href="#about"
               onClick={(e) => handleNavClick("/about", e)}
               className="px-5 py-2 text-gray-700 hover:text-primary transition rounded-full text-sm font-medium"
             >
-              About
+              {t("common.about", "About")}
             </a>
             <a
               href="#courses"
               onClick={(e) => handleNavClick("/courses", e)}
               className="px-5 py-2 text-gray-700 hover:text-primary transition rounded-full text-sm font-medium"
             >
-              Courses
+              {t("courses.title", "Courses")}
             </a>
             <a
               href="#contact"
               onClick={(e) => handleNavClick("/contact", e)}
               className="px-5 py-2 text-gray-700 hover:text-primary transition rounded-full text-sm font-medium"
             >
-              Contact
+              {t("common.contact", "Contact")}
             </a>
           </nav>
 
@@ -153,11 +168,48 @@ export default function Header() {
             </div>
 
             {/* Language Selector */}
-            <button className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-2 text-sm hover:bg-gray-200 transition">
-              <Globe className="w-4 h-4" />
-              <span>English</span>
-              <ChevronDown className="w-3 h-3" />
-            </button>
+            <div ref={langRef} className="relative">
+              <button
+                onClick={() => setIsLangDropdownOpen(!isLangDropdownOpen)}
+                className="flex items-center space-x-1 bg-gray-100 rounded-full px-3 py-2 text-sm hover:bg-gray-200 transition"
+              >
+                <Globe className="w-4 h-4" />
+                <span>{locale === "en" ? "English" : "አማርኛ"}</span>
+                <ChevronDown className="w-3 h-3" />
+              </button>
+
+              {/* Language Dropdown */}
+              {isLangDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                  <button
+                    onClick={() => {
+                      changeLocale("en");
+                      setIsLangDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition ${
+                      locale === "en"
+                        ? "bg-gray-50 text-[#01BC63] font-medium"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => {
+                      changeLocale("am");
+                      setIsLangDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm transition ${
+                      locale === "am"
+                        ? "bg-gray-50 text-[#01BC63] font-medium"
+                        : "text-gray-700 hover:bg-gray-50"
+                    }`}
+                  >
+                    አማርኛ
+                  </button>
+                </div>
+              )}
+            </div>
 
             {/* Auth Section */}
             {isAuthenticated && user ? (
@@ -167,7 +219,7 @@ export default function Header() {
                   className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition"
                 >
                   <User className="w-4 h-4" />
-                  <span>{user.firstName || user.email.split('@')[0]}</span>
+                  <span>{user.firstName || user.email.split("@")[0]}</span>
                 </button>
 
                 {/* Dropdown Menu */}
@@ -288,10 +340,28 @@ export default function Header() {
 
               {/* Mobile Auth */}
               <div className="flex items-center space-x-2 pt-4 border-t">
-                <button className="flex items-center space-x-1 bg-gray-100 rounded-lg px-3 py-2 text-sm">
-                  <Globe className="w-4 h-4" />
-                  <span>English</span>
-                </button>
+                <div className="flex items-center space-x-2">
+                  <button
+                    onClick={() => changeLocale("en")}
+                    className={`px-3 py-2 text-sm rounded-lg transition ${
+                      locale === "en"
+                        ? "bg-[#01BC63] text-white"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    English
+                  </button>
+                  <button
+                    onClick={() => changeLocale("am")}
+                    className={`px-3 py-2 text-sm rounded-lg transition ${
+                      locale === "am"
+                        ? "bg-[#01BC63] text-white"
+                        : "bg-gray-100 text-gray-700"
+                    }`}
+                  >
+                    አማርኛ
+                  </button>
+                </div>
                 {isAuthenticated && user ? (
                   <>
                     <Link
@@ -305,7 +375,7 @@ export default function Header() {
                       className="flex items-center space-x-2 px-4 py-2 text-gray-700"
                     >
                       <User className="w-4 h-4" />
-                      <span>{user.firstName || user.email.split('@')[0]}</span>
+                      <span>{user.firstName || user.email.split("@")[0]}</span>
                     </Link>
                     <button
                       onClick={handleLogout}

@@ -212,21 +212,62 @@ export default function CreatorCoursesPage() {
                   </div>
 
                   {/* Actions */}
-                  <div className="flex gap-2">
-                    <Link
-                      href={`/creator/courses/${course.id}/edit`}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#01BC63] text-white rounded-lg font-medium hover:bg-[#059669] transition-colors text-sm"
-                    >
-                      <Edit className="w-4 h-4" />
-                      Manage
-                    </Link>
-                    <Link
-                      href={`/creator/courses/${course.id}/add-content`}
-                      className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#01BC63] text-[#01BC63] rounded-lg font-medium hover:bg-[#01BC63]/10 transition-colors text-sm"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add Content
-                    </Link>
+                  <div className="flex flex-col gap-2">
+                    {course.status === "DRAFT" && (
+                      <button
+                        onClick={async () => {
+                          if (
+                            !confirm(
+                              "Submit this course for admin review? You won't be able to edit it until it's reviewed."
+                            )
+                          ) {
+                            return;
+                          }
+                          try {
+                            await coursesApi.submitForReview(course.id);
+                            alert("Course submitted for review successfully!");
+                            loadCourses();
+                          } catch (error: any) {
+                            alert(
+                              error.response?.data?.message ||
+                                "Failed to submit course"
+                            );
+                          }
+                        }}
+                        className="w-full flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg font-medium hover:bg-blue-700 transition-colors text-sm"
+                      >
+                        <CheckCircle className="w-4 h-4" />
+                        Submit for Review
+                      </button>
+                    )}
+                    {course.status === "PENDING" && (
+                      <div className="w-full px-4 py-2 bg-blue-100 text-blue-700 rounded-lg text-sm text-center font-medium">
+                        <Clock className="w-4 h-4 inline mr-1" />
+                        Under Review
+                      </div>
+                    )}
+                    {course.status === "REJECTED" && (
+                      <div className="w-full px-4 py-2 bg-red-100 text-red-700 rounded-lg text-sm text-center font-medium mb-2">
+                        <X className="w-4 h-4 inline mr-1" />
+                        Rejected
+                      </div>
+                    )}
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/creator/courses/${course.id}/edit`}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 bg-[#01BC63] text-white rounded-lg font-medium hover:bg-[#059669] transition-colors text-sm"
+                      >
+                        <Edit className="w-4 h-4" />
+                        Manage
+                      </Link>
+                      <Link
+                        href={`/creator/courses/${course.id}/add-content`}
+                        className="flex-1 flex items-center justify-center gap-2 px-4 py-2 border-2 border-[#01BC63] text-[#01BC63] rounded-lg font-medium hover:bg-[#01BC63]/10 transition-colors text-sm"
+                      >
+                        <Plus className="w-4 h-4" />
+                        Add Content
+                      </Link>
+                    </div>
                   </div>
                 </div>
               </div>

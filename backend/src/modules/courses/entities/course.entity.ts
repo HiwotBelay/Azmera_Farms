@@ -116,6 +116,10 @@ export class Course {
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments: Enrollment[];
 
+  // Sections relationship (using string reference to avoid circular dependency)
+  @OneToMany('Section', 'course')
+  sections?: any[];
+
   @CreateDateColumn()
   createdAt: Date;
 

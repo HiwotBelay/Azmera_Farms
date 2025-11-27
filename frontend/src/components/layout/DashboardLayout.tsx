@@ -17,6 +17,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { useAuth } from "@/modules/auth/hooks/useAuth";
+import NotificationBell from "@/components/notifications/NotificationBell";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -49,7 +50,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (user?.email) {
       return user.email[0].toUpperCase();
     }
-    return 'U';
+    return "U";
   };
 
   const getUserDisplayName = () => {
@@ -59,13 +60,13 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     if (user?.firstName) {
       return user.firstName;
     }
-    return user?.email || 'User';
+    return user?.email || "User";
   };
 
   const getUserRole = () => {
-    if (user?.role === 'CREATOR') return 'Creator';
-    if (user?.role === 'ADMIN') return 'Admin';
-    return 'Learner';
+    if (user?.role === "CREATOR") return "Creator";
+    if (user?.role === "ADMIN") return "Admin";
+    return "Learner";
   };
 
   return (
@@ -84,7 +85,9 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 {getUserInitials()}
               </div>
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-gray-800 truncate">{getUserDisplayName()}</p>
+                <p className="font-semibold text-gray-800 truncate">
+                  {getUserDisplayName()}
+                </p>
                 <p className="text-sm text-gray-500">{getUserRole()}</p>
               </div>
             </div>
@@ -110,7 +113,7 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
-            
+
             {/* Logout Button */}
             <button
               onClick={handleLogout}
@@ -133,14 +136,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 onClick={() => setSidebarOpen(!sidebarOpen)}
                 className="lg:hidden text-gray-500"
               >
-                {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+                {sidebarOpen ? (
+                  <X className="w-6 h-6" />
+                ) : (
+                  <Menu className="w-6 h-6" />
+                )}
               </button>
 
               <div className="flex items-center space-x-4 ml-auto">
-                <button className="relative p-2 text-gray-500 hover:text-gray-700">
-                  <Bell className="w-6 h-6" />
-                  <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
-                </button>
+                <NotificationBell />
               </div>
             </div>
           </div>
@@ -160,6 +164,3 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </div>
   );
 }
-
-
-

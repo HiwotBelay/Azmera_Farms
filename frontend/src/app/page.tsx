@@ -1,3 +1,6 @@
+"use client";
+
+import { useTranslation } from "@/hooks/useTranslation";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import HeroSection from "@/components/home/HeroSection";
@@ -9,30 +12,35 @@ import CreatorCTASection from "@/components/home/CreatorCTASection";
 import ContactSection from "@/components/home/ContactSection";
 
 export default function Home() {
+  const { translationVersion } = useTranslation(); // Subscribe to context changes
+
   return (
-    <div className="min-h-screen flex flex-col">
+    <div
+      className="min-h-screen flex flex-col"
+      key={`home-${translationVersion}`}
+    >
       <Header />
       <main className="flex-grow">
         <section id="home" className="scroll-mt-16">
-          <HeroSection />
+          <HeroSection key={`hero-${translationVersion}`} />
         </section>
         <section id="about" className="scroll-mt-16">
-          <AboutSection />
+          <AboutSection key={`about-${translationVersion}`} />
         </section>
         <section id="features" className="scroll-mt-16">
-          <FeaturesSection />
+          <FeaturesSection key={`features-${translationVersion}`} />
         </section>
         <section id="courses" className="scroll-mt-16">
-          <PopularCoursesSection />
+          <PopularCoursesSection key={`courses-${translationVersion}`} />
         </section>
         <section id="categories" className="scroll-mt-16">
-          <CategoriesSection />
+          <CategoriesSection key={`categories-${translationVersion}`} />
         </section>
         <section id="cta" className="scroll-mt-16">
-          <CreatorCTASection />
+          <CreatorCTASection key={`cta-${translationVersion}`} />
         </section>
         <section id="contact" className="scroll-mt-16">
-          <ContactSection />
+          <ContactSection key={`contact-${translationVersion}`} />
         </section>
       </main>
       <Footer />

@@ -12,11 +12,13 @@ import {
   Lock,
   User,
 } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 type AuthMode = "login" | "signup";
 type UserRole = "LEARNER" | "CREATOR" | "ADMIN";
 
 export default function UnifiedAuthForm() {
+  const { t } = useTranslation();
   const router = useRouter();
   const pathname = usePathname();
   const [mode, setMode] = useState<AuthMode>("login");
@@ -43,21 +45,21 @@ export default function UnifiedAuthForm() {
   const roles = [
     {
       value: "LEARNER" as UserRole,
-      label: "Learner",
+      label: t("auth.learner", "Learner"),
       icon: GraduationCap,
       color: "from-[#01BC63] to-[#059669]",
       bgColor: "bg-[#01BC63]",
     },
     {
       value: "CREATOR" as UserRole,
-      label: "Creator",
+      label: t("auth.creator", "Creator"),
       icon: Monitor,
       color: "from-[#FFDE59] to-[#FFD700]",
       bgColor: "bg-[#FFDE59]",
     },
     {
       value: "ADMIN" as UserRole,
-      label: "Admin",
+      label: t("auth.admin", "Admin"),
       icon: Shield,
       color: "from-gray-700 to-gray-900",
       bgColor: "bg-gray-700",
@@ -107,7 +109,29 @@ export default function UnifiedAuthForm() {
         }
       }
     } catch (error: any) {
-      alert(error.message || "An error occurred. Please try again.");
+      // Extract error message from response
+      let errorMessage = "An error occurred. Please try again.";
+
+      if (error.response?.data?.message) {
+        // If it's a single message string
+        if (typeof error.response.data.message === "string") {
+          errorMessage = error.response.data.message;
+        }
+        // If it's an array of validation errors
+        else if (Array.isArray(error.response.data.message)) {
+          errorMessage = error.response.data.message.join("\n");
+        }
+        // If it's an object with error details
+        else if (typeof error.response.data.message === "object") {
+          const messages = Object.values(error.response.data.message).flat();
+          errorMessage = messages.join("\n");
+        }
+      } else if (error.message) {
+        errorMessage = error.message;
+      }
+
+      alert(errorMessage);
+      console.error("Registration error:", error.response?.data || error);
     } finally {
       setIsLoading(false);
     }
@@ -127,12 +151,20 @@ export default function UnifiedAuthForm() {
         {/* Header with gradient */}
         <div className="bg-gradient-to-r from-[#01BC63] to-[#059669] p-6 text-center">
           <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
-            {mode === "login" ? "Welcome Back" : "Join Azemera"}
+            {mode === "login"
+              ? t("auth.loginTitle", "Welcome Back")
+              : t("auth.registerTitle", "Join Azemera")}
           </h1>
           <p className="text-white/90 text-sm md:text-base">
             {mode === "login"
-              ? "Login to continue your learning journey"
-              : "Create your account to get started"}
+              ? t(
+                  "auth.loginSubtitle",
+                  "Login to continue your learning journey"
+                )
+              : t(
+                  "auth.registerSubtitle",
+                  "Create your account to get started"
+                )}
           </p>
         </div>
 
@@ -146,7 +178,7 @@ export default function UnifiedAuthForm() {
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Login
+            {t("common.login", "Login")}
           </button>
           <button
             onClick={() => setMode("signup")}
@@ -156,7 +188,7 @@ export default function UnifiedAuthForm() {
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            Sign Up
+            {t("common.signUp", "Sign Up")}
           </button>
         </div>
 
@@ -165,7 +197,7 @@ export default function UnifiedAuthForm() {
           {mode === "signup" && (
             <div className="mb-5">
               <label className="block text-sm font-semibold text-gray-900 mb-2">
-                Select Your Role
+                {t("auth.selectRole", "Select Your Role")}
               </label>
               <div className="grid grid-cols-3 gap-2 md:gap-3">
                 {roles.map((role) => {
@@ -202,7 +234,7 @@ export default function UnifiedAuthForm() {
                   htmlFor="fullName"
                   className="block text-sm font-semibold text-gray-900 mb-2"
                 >
-                  Full Name
+                  {t("auth.fullName", "Full Name")}
                 </label>
                 <div className="relative">
                   <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -226,7 +258,7 @@ export default function UnifiedAuthForm() {
                 htmlFor="email"
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
-                Email Address
+                {t("auth.email", "Email Address")}
               </label>
               <div className="relative">
                 <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -249,7 +281,7 @@ export default function UnifiedAuthForm() {
                 htmlFor="password"
                 className="block text-sm font-semibold text-gray-900 mb-2"
               >
-                Password
+                {t("auth.password", "Password")}
               </label>
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -262,6 +294,7 @@ export default function UnifiedAuthForm() {
                   placeholder="••••••••"
                   className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
                   required
+                  minLength={8}
                 />
                 <button
                   type="button"
@@ -275,6 +308,12 @@ export default function UnifiedAuthForm() {
                   )}
                 </button>
               </div>
+              {mode === "signup" && (
+                <p className="mt-1 text-xs text-gray-500">
+                  Must be at least 8 characters with uppercase, lowercase, and
+                  number
+                </p>
+              )}
             </div>
 
             {/* Remember Me / Forgot Password (only for login) */}
@@ -289,14 +328,14 @@ export default function UnifiedAuthForm() {
                     className="w-4 h-4 text-[#01BC63] border-gray-300 rounded focus:ring-[#01BC63]"
                   />
                   <span className="ml-2 text-sm text-gray-700">
-                    Remember me
+                    {t("auth.rememberMe", "Remember me")}
                   </span>
                 </label>
                 <a
                   href="/forgot-password"
                   className="text-sm text-[#01BC63] hover:underline font-medium"
                 >
-                  Forgot password?
+                  {t("auth.forgotPassword", "Forgot password?")}
                 </a>
               </div>
             )}
@@ -317,20 +356,10 @@ export default function UnifiedAuthForm() {
                   htmlFor="agreeToTerms"
                   className="ml-2 text-sm text-gray-700 cursor-pointer"
                 >
-                  I agree to the{" "}
-                  <a
-                    href="/terms"
-                    className="text-[#01BC63] hover:underline font-medium"
-                  >
-                    Terms of Service
-                  </a>{" "}
-                  and{" "}
-                  <a
-                    href="/privacy"
-                    className="text-[#01BC63] hover:underline font-medium"
-                  >
-                    Privacy Policy
-                  </a>
+                  {t(
+                    "auth.agreeToTerms",
+                    "I agree to the Terms of Service and Privacy Policy"
+                  )}
                 </label>
               </div>
             )}
@@ -346,10 +375,16 @@ export default function UnifiedAuthForm() {
               {isLoading ? (
                 <>
                   <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {mode === "login" ? "Logging in..." : "Creating account..."}
+                  {mode === "login"
+                    ? t("common.loading", "Logging in...")
+                    : t("common.loading", "Creating account...")}
                 </>
               ) : (
-                <>{mode === "login" ? "Login" : "Create Account"}</>
+                <>
+                  {mode === "login"
+                    ? t("common.login", "Login")
+                    : t("common.register", "Create Account")}
+                </>
               )}
             </button>
           </form>

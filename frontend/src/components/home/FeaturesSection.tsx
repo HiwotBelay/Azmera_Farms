@@ -1,63 +1,73 @@
 "use client";
 
+import React, { useEffect } from "react";
 import { BookOpen, Globe, Award, Users, Smartphone, Clock } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const features = [
-  {
-    icon: BookOpen,
-    title: "Offline Learning",
-    description:
-      "Download courses and learn without internet connection. Perfect for rural areas.",
-    color: "from-[#01BC63]",
-  },
-  {
-    icon: Globe,
-    title: "Multi-Language Support",
-    description: "Learn in Amharic, Afaan Oromo, Tigrigna, or English.",
-    color: "from-[#FFDE59]",
-  },
-  {
-    icon: Award,
-    title: "Verified Certificates",
-    description: "Earn recognized certificates that boost your credibility.",
-    color: "from-[#01BC63]",
-  },
-  {
-    icon: Users,
-    title: "Expert Instructors",
-    description: "Learn from experienced agricultural professionals.",
-    color: "from-[#FFDE59]",
-  },
-  {
-    icon: Smartphone,
-    title: "Mobile-First Design",
-    description: "Optimized for smartphones and tablets. Learn anywhere.",
-    color: "from-[#01BC63]",
-  },
-  {
-    icon: Clock,
-    title: "24/7 Support",
-    description: "Get help when you need it with our dedicated team.",
-    color: "from-[#FFDE59]",
-  },
-];
+// Features will be translated in component
 
 export default function FeaturesSection() {
+  const { t, translationVersion } = useTranslation();
+
+  useEffect(() => {
+    console.log(
+      `[FeaturesSection] Re-rendered, translation version: ${translationVersion}`
+    );
+  }, [translationVersion]);
   return (
     <section className="py-20 lg:py-28 bg-white">
       <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20 max-w-7xl">
         <div className="text-center mb-16 lg:mb-20">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-4">
-            Why Choose Our Platform?
+            {t("home.featuresTitle", "Why Choose Us")}
           </h2>
           <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
-            Designed specifically for farmers with features that work in
-            real-world conditions.
+            {t(
+              "home.featuresDescription",
+              "Designed specifically for farmers with features that work in real-world conditions."
+            )}
           </p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-          {features.map((feature, index) => {
+          {[
+            {
+              icon: BookOpen,
+              titleKey: "home.feature1Title",
+              descKey: "home.feature1Desc",
+              color: "from-[#01BC63]",
+            },
+            {
+              icon: Globe,
+              titleKey: "home.feature2Title",
+              descKey: "home.feature2Desc",
+              color: "from-[#FFDE59]",
+            },
+            {
+              icon: Award,
+              titleKey: "home.feature3Title",
+              descKey: "home.feature3Desc",
+              color: "from-[#01BC63]",
+            },
+            {
+              icon: Users,
+              titleKey: "home.feature4Title",
+              descKey: "home.feature4Desc",
+              color: "from-[#FFDE59]",
+            },
+            {
+              icon: Smartphone,
+              titleKey: "home.feature5Title",
+              descKey: "home.feature5Desc",
+              color: "from-[#01BC63]",
+            },
+            {
+              icon: Clock,
+              titleKey: "home.feature6Title",
+              descKey: "home.feature6Desc",
+              color: "from-[#FFDE59]",
+            },
+          ].map((feature, index) => {
             const Icon = feature.icon;
             return (
               <div
@@ -72,10 +82,10 @@ export default function FeaturesSection() {
                   </div>
 
                   <h3 className="text-xl font-bold text-gray-900 mb-3">
-                    {feature.title}
+                    {t(feature.titleKey, feature.titleKey)}
                   </h3>
                   <p className="text-gray-600 leading-relaxed text-base">
-                    {feature.description}
+                    {t(feature.descKey, feature.descKey)}
                   </p>
                 </div>
               </div>

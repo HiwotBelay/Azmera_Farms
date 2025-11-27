@@ -73,5 +73,9 @@ export class User {
   // Courses relationship (using string reference to avoid circular dependency)
   @OneToMany('Course', 'creator')
   courses?: any[];
+
+  // Enrollments relationship (using string reference to avoid circular dependency)
+  @OneToMany('Enrollment', 'user')
+  enrollments?: any[];
 }
 

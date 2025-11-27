@@ -1,36 +1,20 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { Users, BookOpen, Award, TrendingUp } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
-const stats = [
-  {
-    icon: Users,
-    value: "10,000+",
-    label: "Active Learners",
-    color: "from-[#01BC63] to-[#01BC63]/80",
-  },
-  {
-    icon: BookOpen,
-    value: "500+",
-    label: "Expert Courses",
-    color: "from-[#FFDE59] to-[#FFDE59]/80",
-  },
-  {
-    icon: Award,
-    value: "95%",
-    label: "Success Rate",
-    color: "from-[#01BC63] to-[#FFDE59]",
-  },
-  {
-    icon: TrendingUp,
-    value: "50+",
-    label: "Expert Instructors",
-    color: "from-[#FFDE59] to-[#01BC63]",
-  },
-];
+// Stats will be translated in component
 
 export default function AboutSection() {
+  const { t, translationVersion } = useTranslation();
+
+  // Force re-render when translations change
+  useEffect(() => {
+    console.log(
+      `[AboutSection] Re-rendered, translation version: ${translationVersion}`
+    );
+  }, [translationVersion]);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -57,20 +41,49 @@ export default function AboutSection() {
         {/* About Azemera Section */}
         <div className="text-center mb-16 lg:mb-20">
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900">
-            About <span className="text-[#01BC63]">Azemera Academy</span>
+            {t("home.aboutTitle", "About")}{" "}
+            <span className="text-[#01BC63]">Azemera Academy</span>
           </h2>
           <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            Empowering Ethiopian farmers and agricultural professionals with
-            modern, practical education to transform agriculture and improve
-            livelihoods. We connect expert instructors with eager learners,
-            creating a community where traditional farming wisdom meets modern
-            agricultural techniques.
+            {t(
+              "home.aboutDescription",
+              "Empowering Ethiopian farmers and agricultural professionals with modern, practical education to transform agriculture and improve livelihoods. We connect expert instructors with eager learners, creating a community where traditional farming wisdom meets modern agricultural techniques."
+            )}
           </p>
         </div>
 
         {/* Interactive Stats Grid */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 lg:mb-20">
-          {stats.map((stat, index) => {
+          {[
+            {
+              icon: Users,
+              value: "10,000+",
+              labelKey: "home.activeLearners",
+              label: "Active Learners",
+              color: "from-[#01BC63] to-[#01BC63]/80",
+            },
+            {
+              icon: BookOpen,
+              value: "500+",
+              labelKey: "home.expertCourses",
+              label: "Expert Courses",
+              color: "from-[#FFDE59] to-[#FFDE59]/80",
+            },
+            {
+              icon: Award,
+              value: "95%",
+              labelKey: "home.successRate",
+              label: "Success Rate",
+              color: "from-[#01BC63] to-[#FFDE59]",
+            },
+            {
+              icon: TrendingUp,
+              value: "50+",
+              labelKey: "home.expertInstructors",
+              label: "Expert Instructors",
+              color: "from-[#FFDE59] to-[#01BC63]",
+            },
+          ].map((stat, index) => {
             const Icon = stat.icon;
             return (
               <div
@@ -92,7 +105,7 @@ export default function AboutSection() {
                     {stat.value}
                   </div>
                   <p className="text-sm text-gray-600 font-medium">
-                    {stat.label}
+                    {t(stat.labelKey, stat.label)}
                   </p>
                 </div>
               </div>
@@ -104,13 +117,13 @@ export default function AboutSection() {
         <div className="max-w-4xl mx-auto">
           <div className="bg-gradient-to-br from-[#01BC63]/10 via-white to-[#FFDE59]/10 rounded-3xl p-10 lg:p-14 border-2 border-[#01BC63]/20 shadow-xl">
             <h3 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 text-center">
-              Our Mission
+              {t("home.missionTitle", "Our Mission")}
             </h3>
             <p className="text-lg md:text-xl text-gray-700 leading-relaxed text-center">
-              Azemera Academy is dedicated to bridging the knowledge gap in
-              Ethiopian agriculture by providing accessible, high-quality online
-              education. We believe that education is the key to sustainable
-              agricultural development and food security for our nation.
+              {t(
+                "home.missionDescription",
+                "Azemera Academy is dedicated to bridging the knowledge gap in Ethiopian agriculture by providing accessible, high-quality online education. We believe that education is the key to sustainable agricultural development and food security for our nation."
+              )}
             </p>
           </div>
         </div>

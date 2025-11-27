@@ -12,6 +12,12 @@ import { Enrollment } from '../modules/courses/entities/enrollment.entity';
 import { Category } from '../modules/courses/entities/category.entity';
 import { LessonProgress } from '../modules/courses/entities/lesson-progress.entity';
 import { Media } from '../modules/media/entities/media.entity';
+import { Notification } from '../modules/notifications/entities/notification.entity';
+import { Quiz } from '../modules/courses/entities/quiz.entity';
+import { QuizQuestion } from '../modules/courses/entities/quiz-question.entity';
+import { QuizAttempt } from '../modules/courses/entities/quiz-attempt.entity';
+import { QuizAnswer } from '../modules/courses/entities/quiz-answer.entity';
+import { Review } from '../modules/courses/entities/review.entity';
 
 @Module({
   imports: [
@@ -46,6 +52,12 @@ import { Media } from '../modules/media/entities/media.entity';
                 Category,
                 LessonProgress,
                 Media,
+                Notification,
+                Quiz,
+                QuizQuestion,
+                QuizAttempt,
+                QuizAnswer,
+                Review,
               ],
               synchronize: configService.get('NODE_ENV') === 'development',
               logging: configService.get('NODE_ENV') === 'development',
@@ -75,6 +87,12 @@ import { Media } from '../modules/media/entities/media.entity';
                 Category,
                 LessonProgress,
                 Media,
+                Notification,
+                Quiz,
+                QuizQuestion,
+                QuizAttempt,
+                QuizAnswer,
+                Review,
               ],
               synchronize: configService.get('NODE_ENV') === 'development',
               logging: configService.get('NODE_ENV') === 'development',

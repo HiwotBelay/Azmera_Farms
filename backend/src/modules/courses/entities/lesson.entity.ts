@@ -8,6 +8,7 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { Course } from './course.entity';
+import { Section } from './section.entity';
 
 export enum LessonType {
   VIDEO = 'VIDEO',
@@ -26,6 +27,13 @@ export class Lesson {
 
   @Column({ nullable: false })
   courseId: string;
+
+  @ManyToOne(() => Section, (section) => section.lessons, { nullable: true, onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'sectionId' })
+  section: Section;
+
+  @Column({ nullable: true })
+  sectionId: string;
 
   @Column()
   title: string;

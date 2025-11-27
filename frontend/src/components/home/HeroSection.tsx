@@ -1,9 +1,29 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import { ChevronRight, Sparkles } from "lucide-react"
+import React from "react";
+import Link from "next/link";
+import { ChevronRight, Sparkles } from "lucide-react";
+import { useTranslation } from "@/hooks/useTranslation";
 
 export default function HeroSection() {
+  const translationContext = useTranslation();
+  const { t, locale, isLoading, translationVersion } = translationContext;
+
+  // Debug logging
+  React.useEffect(() => {
+    console.log(
+      `[HeroSection] Re-rendered with locale: ${locale}, isLoading: ${isLoading}, version: ${translationVersion}`
+    );
+    console.log(`[HeroSection] Translation context:`, translationContext);
+  }, [locale, isLoading, translationVersion, translationContext]);
+
+  // Test translation
+  React.useEffect(() => {
+    const testKey = "home.badge";
+    const result = t(testKey, "Transform Your Future Today");
+    console.log(`[HeroSection] Test translation for "${testKey}": "${result}"`);
+  }, [t, translationVersion]);
+
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-[#f0fef9] to-[#e8fdf5]">
       <div className="absolute inset-0 overflow-hidden">
@@ -18,20 +38,26 @@ export default function HeroSection() {
           <div className="space-y-8 z-10">
             <div className="flex items-center gap-2 bg-[#01BC63]/10 backdrop-blur-md border border-[#01BC63]/30 rounded-full px-4 py-2 w-fit">
               <Sparkles className="w-4 h-4 text-[#01BC63]" />
-              <span className="text-sm font-semibold text-[#01BC63]">✨ Transform Your Future Today</span>
+              <span className="text-sm font-semibold text-[#01BC63]">
+                ✨ {t("home.badge", "Transform Your Future Today")}
+              </span>
             </div>
 
             <div>
               <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-                <span className="text-gray-900">Transform Agriculture Through</span>{" "}
+                <span className="text-gray-900">
+                  {t("home.heroTitle1", "Transform Agriculture Through")}
+                </span>{" "}
                 <span className="bg-gradient-to-r from-[#01BC63] to-[#FFDE59] bg-clip-text text-transparent">
-                  Learning
+                  {t("home.heroTitle2", "Learning")}
                 </span>
               </h1>
 
               <p className="text-xl text-gray-700 leading-relaxed max-w-lg">
-                Join thousands of farmers, students, and agricultural professionals mastering modern farming techniques
-                with expert-led courses designed for success.
+                {t(
+                  "home.heroDescription",
+                  "Join thousands of farmers, students, and agricultural professionals mastering modern farming techniques with expert-led courses designed for success."
+                )}
               </p>
             </div>
 
@@ -41,7 +67,7 @@ export default function HeroSection() {
                 className="group relative px-8 py-4 bg-gradient-to-r from-[#01BC63] to-[#01BC63] text-white rounded-xl font-semibold overflow-hidden transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-[#01BC63]/50"
               >
                 <span className="relative flex items-center justify-center gap-2">
-                  Start Learning
+                  {t("home.startLearning", "Start Learning")}
                   <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
               </Link>
@@ -49,7 +75,7 @@ export default function HeroSection() {
                 href="/courses"
                 className="px-8 py-4 bg-[#01BC63]/10 border-2 border-[#01BC63] text-[#01BC63] rounded-xl font-semibold hover:bg-[#01BC63]/20 transition-all duration-300 hover:scale-105"
               >
-                Explore Courses
+                {t("home.exploreCourses", "Explore Courses")}
               </Link>
             </div>
 
@@ -57,15 +83,21 @@ export default function HeroSection() {
             <div className="flex gap-8 pt-8 border-t border-gray-300">
               <div>
                 <p className="text-3xl font-bold text-[#01BC63]">1,000+</p>
-                <p className="text-sm text-gray-600">Active Learners</p>
+                <p className="text-sm text-gray-600">
+                  {t("home.activeLearners", "Active Learners")}
+                </p>
               </div>
               <div>
                 <p className="text-3xl font-bold text-[#01BC63]">500+</p>
-                <p className="text-sm text-gray-600">Expert Courses</p>
+                <p className="text-sm text-gray-600">
+                  {t("home.expertCourses", "Expert Courses")}
+                </p>
               </div>
               <div>
                 <p className="text-3xl font-bold text-[#01BC63]">95%</p>
-                <p className="text-sm text-gray-600">Success Rate</p>
+                <p className="text-sm text-gray-600">
+                  {t("home.successRate", "Success Rate")}
+                </p>
               </div>
             </div>
           </div>
@@ -76,15 +108,14 @@ export default function HeroSection() {
             <div className="absolute inset-8 bg-gradient-to-br from-[#01BC63]/10 to-[#FFDE59]/10 rounded-3xl backdrop-blur-xl border border-[#01BC63]/30 flex items-center justify-center">
               <div className="text-center">
                 <div className="w-24 h-24 bg-gradient-to-r from-[#01BC63] to-[#FFDE59] rounded-2xl mx-auto mb-4 animate-pulse"></div>
-                <p className="text-gray-900 font-semibold">Quality Education</p>
+                <p className="text-gray-900 font-semibold">
+                  {t("home.qualityEducation", "Quality Education")}
+                </p>
               </div>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }
-
-
-
