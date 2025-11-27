@@ -2,16 +2,16 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
   JoinColumn,
 } from 'typeorm';
-import { Section } from './section.entity';
+import { Course } from './course.entity';
 
 export enum LessonType {
   VIDEO = 'VIDEO',
-  DOCUMENT = 'DOCUMENT',
+  PDF = 'PDF',
   BOTH = 'BOTH',
 }
 
@@ -20,10 +20,17 @@ export class Lesson {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
+  @ManyToOne(() => Course, (course) => course.lessons, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'courseId' })
+  course: Course;
+
+  @Column({ nullable: false })
+  courseId: string;
+
   @Column()
   title: string;
 
-  @Column('text', { nullable: true })
+  @Column({ type: 'text', nullable: true })
   description: string;
 
   @Column({
@@ -34,29 +41,22 @@ export class Lesson {
   type: LessonType;
 
   @Column({ nullable: true })
-  videoUrl: string;
+  videoUrl: string; // Video file URL or HLS manifest URL
 
   @Column({ nullable: true })
-  documentUrl: string;
+  pdfUrl: string; // PDF file URL
 
-  @Column({ nullable: true })
-  duration: string;
+  @Column({ type: 'int', default: 0 })
+  order: number; // Lesson order in course
 
-  @Column({ nullable: true })
-  fileSize: string;
+  @Column({ type: 'int', nullable: true })
+  duration: number; // Duration in minutes
 
-  @Column({ default: 0 })
-  order: number;
+  @Column({ default: false })
+  isPreview: boolean; // Free preview lesson
 
-  @Column({ default: 0 })
-  views: number;
-
-  @ManyToOne(() => Section, (section) => section.lessons, { onDelete: 'CASCADE' })
-  @JoinColumn({ name: 'sectionId' })
-  section: Section;
-
-  @Column()
-  sectionId: string;
+  @Column({ default: true })
+  isActive: boolean;
 
   @CreateDateColumn()
   createdAt: Date;

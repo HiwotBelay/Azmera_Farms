@@ -2,43 +2,44 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
   JoinColumn,
-  Index,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
 import { Course } from './course.entity';
 
 @Entity('enrollments')
-@Index(['userId', 'courseId'], { unique: true })
 export class Enrollment {
   @PrimaryGeneratedColumn('uuid')
   id: string;
 
-  @ManyToOne(() => User)
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'userId' })
   user: User;
 
   @Column()
   userId: string;
 
-  @ManyToOne(() => Course, (course) => course.enrollments)
+  @ManyToOne(() => Course, { onDelete: 'CASCADE' })
   @JoinColumn({ name: 'courseId' })
   course: Course;
 
   @Column()
   courseId: string;
 
-  @Column({ default: 0 })
-  progress: number;
+  @Column({ type: 'decimal', precision: 5, scale: 2, default: 0 })
+  progress: number; // Completion percentage (0-100)
 
   @Column({ default: false })
-  completed: boolean;
+  isCompleted: boolean;
 
   @Column({ nullable: true })
   completedAt: Date;
+
+  @Column({ type: 'int', default: 0 })
+  lastLessonOrder: number; // Last accessed lesson order
 
   @CreateDateColumn()
   enrolledAt: Date;

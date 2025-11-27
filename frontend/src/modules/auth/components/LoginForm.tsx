@@ -4,9 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 export default function LoginForm() {
   const router = useRouter();
+  const { login } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     email: "",
@@ -14,20 +16,38 @@ export default function LoginForm() {
     rememberMe: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    // Mock login - redirect to dashboard
-    setTimeout(() => {
+    try {
+      const loggedInUser = await login(formData.email, formData.password);
+      // Redirect based on user role
+      if (loggedInUser.role === 'ADMIN') {
+        router.push("/admin/dashboard");
+      } else if (loggedInUser.role === 'CREATOR') {
+        router.push("/creator/dashboard");
+      } else {
+        router.push("/dashboard");
+      }
+    } catch (err: any) {
+      setError(err.message || "Login failed. Please check your credentials.");
+    } finally {
       setIsLoading(false);
-      router.push("/dashboard");
-    }, 1000);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+      
       {/* Email */}
       <div>
         <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
@@ -99,4 +119,6 @@ export default function LoginForm() {
     </form>
   );
 }
+
+
 

@@ -1,18 +1,21 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Search, Globe, Menu, X, ChevronDown } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, Globe, Menu, X, ChevronDown, User, LogOut } from "lucide-react";
 import { useState, useRef, useEffect } from "react";
 import Logo from "@/components/ui/Logo";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 export default function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchExpanded, setIsSearchExpanded] = useState(false);
   const [isAuthDropdownOpen, setIsAuthDropdownOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
   const searchRef = useRef<HTMLDivElement>(null);
   const authRef = useRef<HTMLDivElement>(null);
+  const { user, isAuthenticated, logout } = useAuth();
 
   // Close search when clicking outside
   useEffect(() => {
@@ -75,10 +78,16 @@ export default function Header() {
     }
   };
 
+  const handleLogout = async () => {
+    await logout();
+    setIsAuthDropdownOpen(false);
+    router.push("/");
+  };
+
   return (
     <header className="bg-white shadow-sm sticky top-0 z-50">
       <div className="container mx-auto px-6 md:px-8 lg:px-12 max-w-7xl">
-        <div className="flex items-center h-16 relative">
+        <div className="flex items-center justify-between h-16 w-full relative">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2">
             <Logo />
@@ -150,35 +159,73 @@ export default function Header() {
               <ChevronDown className="w-3 h-3" />
             </button>
 
-            {/* Auth Dropdown */}
-            <div ref={authRef} className="relative">
-              <button
-                onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
-                className="px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition"
-              >
-                Sign In
-              </button>
+            {/* Auth Section */}
+            {isAuthenticated && user ? (
+              <div ref={authRef} className="relative">
+                <button
+                  onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
+                  className="flex items-center space-x-2 px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition"
+                >
+                  <User className="w-4 h-4" />
+                  <span>{user.firstName || user.email.split('@')[0]}</span>
+                </button>
 
-              {/* Dropdown Menu */}
-              {isAuthDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
-                  <Link
-                    href="/login"
-                    onClick={() => setIsAuthDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
-                  >
-                    Login
-                  </Link>
-                  <Link
-                    href="/register"
-                    onClick={() => setIsAuthDropdownOpen(false)}
-                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
-                  >
-                    Sign Up
-                  </Link>
-                </div>
-              )}
-            </div>
+                {/* Dropdown Menu */}
+                {isAuthDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link
+                      href={
+                        user.role === "ADMIN"
+                          ? "/admin/dashboard"
+                          : user.role === "CREATOR"
+                          ? "/creator/dashboard"
+                          : "/dashboard"
+                      }
+                      onClick={() => setIsAuthDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      Dashboard
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-50 transition flex items-center space-x-2"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div ref={authRef} className="relative">
+                <button
+                  onClick={() => setIsAuthDropdownOpen(!isAuthDropdownOpen)}
+                  className="px-4 py-2 bg-gray-900 text-white rounded-full text-sm font-medium hover:bg-gray-800 transition"
+                >
+                  Sign In
+                </button>
+
+                {/* Dropdown Menu */}
+                {isAuthDropdownOpen && (
+                  <div className="absolute right-0 mt-2 w-40 bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50">
+                    <Link
+                      href="/login"
+                      onClick={() => setIsAuthDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      onClick={() => setIsAuthDropdownOpen(false)}
+                      className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-50 transition"
+                    >
+                      Sign Up
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -245,18 +292,45 @@ export default function Header() {
                   <Globe className="w-4 h-4" />
                   <span>English</span>
                 </button>
-                <Link
-                  href="/login"
-                  className="px-4 py-2 text-primary border border-primary rounded-lg"
-                >
-                  Login
-                </Link>
-                <Link
-                  href="/register"
-                  className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
-                >
-                  Sign Up
-                </Link>
+                {isAuthenticated && user ? (
+                  <>
+                    <Link
+                      href={
+                        user.role === "ADMIN"
+                          ? "/admin/dashboard"
+                          : user.role === "CREATOR"
+                          ? "/creator/dashboard"
+                          : "/dashboard"
+                      }
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700"
+                    >
+                      <User className="w-4 h-4" />
+                      <span>{user.firstName || user.email.split('@')[0]}</span>
+                    </Link>
+                    <button
+                      onClick={handleLogout}
+                      className="flex items-center space-x-2 px-4 py-2 text-gray-700"
+                    >
+                      <LogOut className="w-4 h-4" />
+                      <span>Logout</span>
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link
+                      href="/login"
+                      className="px-4 py-2 text-primary border border-primary rounded-lg"
+                    >
+                      Login
+                    </Link>
+                    <Link
+                      href="/register"
+                      className="px-4 py-2 bg-primary text-white rounded-lg whitespace-nowrap"
+                    >
+                      Sign Up
+                    </Link>
+                  </>
+                )}
               </div>
             </nav>
           </div>

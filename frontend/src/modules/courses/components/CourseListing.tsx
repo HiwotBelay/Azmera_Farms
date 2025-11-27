@@ -10,36 +10,39 @@ export default function CourseListing() {
   const [searchQuery, setSearchQuery] = useState("");
   const [courses, setCourses] = useState<Course[]>([]);
   const [loading, setLoading] = useState(true);
+  const [total, setTotal] = useState(0);
 
   useEffect(() => {
-    loadCourses();
-  }, [searchQuery]);
+    const fetchCourses = async () => {
+      try {
+        setLoading(true);
+        const response = await coursesApi.getAll({
+          search: searchQuery || undefined,
+          limit: 20,
+          page: 0,
+        });
+        setCourses(response.courses);
+        setTotal(response.total);
+      } catch (error) {
+        console.error('Error fetching courses:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
 
-  const loadCourses = async () => {
-    try {
-      setLoading(true);
-      const data = await coursesApi.getAll({
-        status: "PUBLISHED",
-        search: searchQuery || undefined,
-      });
-      setCourses(data);
-    } catch (error: any) {
-      console.error("Failed to load courses:", error);
-    } finally {
-      setLoading(false);
-    }
-  };
+    const debounceTimer = setTimeout(() => {
+      fetchCourses();
+    }, 500);
+
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
   return (
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-3xl font-bold text-gray-800 mb-2">
-          Browse Courses
-        </h1>
-        <p className="text-gray-600">
-          Discover courses to enhance your agricultural skills
-        </p>
+        <h1 className="text-3xl font-bold text-gray-800 mb-2">Browse Courses</h1>
+        <p className="text-gray-600">Discover courses to enhance your agricultural skills</p>
       </div>
 
       {/* Search and Filters */}
@@ -62,14 +65,32 @@ export default function CourseListing() {
         </div>
       </div>
 
+      {/* Results Count */}
+      {!loading && (
+        <div className="mb-4 text-sm text-gray-600">
+          {total} {total === 1 ? 'course' : 'courses'} found
+        </div>
+      )}
+
       {/* Course Grid */}
       {loading ? (
-        <div className="flex items-center justify-center h-64">
-          <div className="w-8 h-8 border-4 border-[#01BC63] border-t-transparent rounded-full animate-spin" />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {[1, 2, 3, 4, 5, 6].map((i) => (
+            <div key={i} className="bg-white rounded-xl shadow-md overflow-hidden animate-pulse">
+              <div className="w-full h-48 bg-gray-200"></div>
+              <div className="p-4">
+                <div className="h-4 w-3/4 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          ))}
         </div>
       ) : courses.length === 0 ? (
-        <div className="text-center py-12">
-          <p className="text-gray-600">No courses found</p>
+        <div className="bg-gray-50 rounded-xl p-8 text-center">
+          <p className="text-gray-600 mb-4">No courses found.</p>
+          {searchQuery && (
+            <p className="text-sm text-gray-500">Try adjusting your search terms.</p>
+          )}
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

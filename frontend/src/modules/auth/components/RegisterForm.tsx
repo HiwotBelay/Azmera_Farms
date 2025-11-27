@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Eye, EyeOff } from "lucide-react";
+import { useAuth } from "../hooks/useAuth";
 
 interface RegisterFormProps {
   role: "LEARNER" | "CREATOR";
@@ -10,6 +11,7 @@ interface RegisterFormProps {
 
 export default function RegisterForm({ role }: RegisterFormProps) {
   const router = useRouter();
+  const { register } = useAuth();
   const [showPassword, setShowPassword] = useState(false);
   const [formData, setFormData] = useState({
     fullName: "",
@@ -22,24 +24,47 @@ export default function RegisterForm({ role }: RegisterFormProps) {
     agreeToTerms: false,
   });
   const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setError(null);
     
-    // Mock registration
-    setTimeout(() => {
-      setIsLoading(false);
+    try {
+      // Split fullName into firstName and lastName
+      const nameParts = formData.fullName.trim().split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      await register({
+        email: formData.email,
+        password: formData.password,
+        firstName: firstName || undefined,
+        lastName: lastName || undefined,
+        role: role,
+      });
+
       if (role === "CREATOR") {
         router.push("/creator/application");
       } else {
         router.push("/dashboard");
       }
-    }, 1000);
+    } catch (err: any) {
+      setError(err.message || "Registration failed. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      {error && (
+        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-lg text-sm">
+          {error}
+        </div>
+      )}
+      
       {/* Full Name */}
       <div>
         <label htmlFor="fullName" className="block text-sm font-medium text-gray-700 mb-2">
@@ -157,4 +182,6 @@ export default function RegisterForm({ role }: RegisterFormProps) {
     </form>
   );
 }
+
+
 

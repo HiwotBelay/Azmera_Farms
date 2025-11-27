@@ -1,21 +1,30 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { CoursesService } from './courses.service';
 import { CoursesController } from './courses.controller';
+import { ProgressController } from './progress.controller';
+import { CoursesService } from './courses.service';
+import { ProgressService } from './progress.service';
 import { Course } from './entities/course.entity';
-import { Section } from './entities/section.entity';
 import { Lesson } from './entities/lesson.entity';
 import { Enrollment } from './entities/enrollment.entity';
-import { AuthModule } from '../auth/auth.module';
+import { Category } from './entities/category.entity';
+import { LessonProgress } from './entities/lesson-progress.entity';
+import { User } from '../auth/entities/user.entity';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([Course, Section, Lesson, Enrollment]),
-    AuthModule,
+    TypeOrmModule.forFeature([
+      Course,
+      Lesson,
+      Enrollment,
+      Category,
+      LessonProgress,
+      User,
+    ]),
   ],
-  controllers: [CoursesController],
-  providers: [CoursesService],
-  exports: [CoursesService],
+  controllers: [CoursesController, ProgressController],
+  providers: [CoursesService, ProgressService],
+  exports: [CoursesService, ProgressService],
 })
 export class CoursesModule {}
 

@@ -2,14 +2,15 @@ import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
-  ManyToOne,
-  OneToMany,
   CreateDateColumn,
   UpdateDateColumn,
+  ManyToOne,
+  OneToMany,
   JoinColumn,
 } from 'typeorm';
 import { User } from '../../auth/entities/user.entity';
-import { Section } from './section.entity';
+import { Category } from './category.entity';
+import { Lesson } from './lesson.entity';
 import { Enrollment } from './enrollment.entity';
 
 export enum CourseStatus {
@@ -25,11 +26,6 @@ export enum CourseLevel {
   ADVANCED = 'ADVANCED',
 }
 
-export enum CourseLanguage {
-  ENGLISH = 'ENGLISH',
-  AMHARIC = 'AMHARIC',
-}
-
 @Entity('courses')
 export class Course {
   @PrimaryGeneratedColumn('uuid')
@@ -38,14 +34,25 @@ export class Course {
   @Column()
   title: string;
 
-  @Column('text')
+  @Column({ type: 'text' })
   description: string;
 
-  @Column({ nullable: true })
-  thumbnail: string;
+  @Column({ type: 'text', nullable: true })
+  shortDescription: string;
 
-  @Column('decimal', { precision: 10, scale: 2, default: 0 })
-  price: number;
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: 'creatorId' })
+  creator: User;
+
+  @Column()
+  creatorId: string;
+
+  @ManyToOne(() => Category, { nullable: true })
+  @JoinColumn({ name: 'categoryId' })
+  category: Category;
+
+  @Column({ nullable: true })
+  categoryId: string;
 
   @Column({
     type: 'enum',
@@ -57,46 +64,54 @@ export class Course {
   @Column({
     type: 'enum',
     enum: CourseLevel,
+    default: CourseLevel.BEGINNER,
   })
   level: CourseLevel;
 
-  @Column({
-    type: 'enum',
-    enum: CourseLanguage,
-    default: CourseLanguage.ENGLISH,
-  })
-  language: CourseLanguage;
+  @Column({ type: 'decimal', precision: 10, scale: 2, default: 0 })
+  price: number;
 
-  @Column()
-  category: string;
-
-  @Column({ default: 0 })
-  totalStudents: number;
-
-  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
-  averageRating: number;
-
-  @Column({ default: 0 })
-  totalReviews: number;
-
-  @Column({ default: 0 })
-  totalViews: number;
-
-  @Column({ default: 0 })
-  totalEnrollments: number;
+  @Column({ default: false })
+  isFree: boolean;
 
   @Column({ nullable: true })
-  estimatedDuration: string;
+  thumbnail: string; // Thumbnail image URL
 
-  @ManyToOne(() => User, (user) => user.courses)
-  @JoinColumn({ name: 'creatorId' })
-  creator: User;
+  @Column({ type: 'jsonb', nullable: true })
+  images: string[]; // Array of image URLs
 
-  @Column()
-  creatorId: string;
+  @Column({ default: 0 })
+  duration: number; // Total duration in minutes
 
-  @OneToMany(() => Section, (section) => section.course, { cascade: true })
-  sections: Section[];
+  @Column({ default: 0 })
+  lessonsCount: number;
+
+  @Column({ default: 0 })
+  studentsCount: number;
+
+  @Column({ type: 'decimal', precision: 3, scale: 2, default: 0 })
+  rating: number; // Average rating
+
+  @Column({ default: 0 })
+  reviewsCount: number;
+
+  @Column({ type: 'jsonb', nullable: true })
+  tags: string[]; // Array of tags
+
+  @Column({ type: 'text', nullable: true })
+  language: string; // 'en' or 'am'
+
+  @Column({ nullable: true })
+  rejectionReason: string; // If rejected by admin
+
+  @Column({ nullable: true })
+  reviewedBy: string; // Admin user ID who reviewed
+
+  @Column({ nullable: true })
+  reviewedAt: Date;
+
+  @OneToMany(() => Lesson, (lesson) => lesson.course, { cascade: true })
+  lessons: Lesson[];
 
   @OneToMany(() => Enrollment, (enrollment) => enrollment.course)
   enrollments: Enrollment[];

@@ -11,6 +11,9 @@ export class AppController {
       endpoints: {
         auth: '/api/auth',
         users: '/api/users',
+        admin: '/api/admin',
+        courses: '/api/courses',
+        media: '/api/media',
       },
     };
   }
@@ -23,4 +26,6 @@ export class AppController {
     };
   }
 }
+
+
 

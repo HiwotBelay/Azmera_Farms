@@ -1,37 +1,35 @@
-import { apiClient } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 
 export interface Course {
   id: string;
   title: string;
   description: string;
-  thumbnail?: string;
-  price: number;
-  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED';
-  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  language: 'ENGLISH' | 'AMHARIC';
-  category: string;
-  totalStudents: number;
-  averageRating: number;
-  totalReviews: number;
-  totalViews: number;
-  totalEnrollments: number;
-  estimatedDuration?: string;
-  creator: {
+  shortDescription?: string;
+  creatorId: string;
+  creator?: {
     id: string;
-    firstName: string;
-    lastName: string;
+    firstName?: string;
+    lastName?: string;
     email: string;
   };
-  sections?: Section[];
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Section {
-  id: string;
-  title: string;
-  description?: string;
-  order: number;
+  categoryId?: string;
+  category?: {
+    id: string;
+    name: string;
+  };
+  status: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED';
+  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
+  price: number;
+  isFree: boolean;
+  thumbnail?: string;
+  images?: string[];
+  duration: number;
+  lessonsCount: number;
+  studentsCount: number;
+  rating: number;
+  reviewsCount: number;
+  tags?: string[];
+  language?: string;
   lessons?: Lesson[];
   createdAt: string;
   updatedAt: string;
@@ -39,122 +37,131 @@ export interface Section {
 
 export interface Lesson {
   id: string;
+  courseId: string;
   title: string;
   description?: string;
-  type: 'VIDEO' | 'DOCUMENT' | 'BOTH';
+  type: 'VIDEO' | 'PDF' | 'BOTH';
   videoUrl?: string;
-  documentUrl?: string;
-  duration?: string;
-  fileSize?: string;
+  pdfUrl?: string;
   order: number;
-  views: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface Enrollment {
-  id: string;
-  userId: string;
-  courseId: string;
-  progress: number;
-  completed: boolean;
-  completedAt?: string;
-  enrolledAt: string;
-  course: Course;
+  duration?: number;
+  isPreview: boolean;
+  isActive: boolean;
 }
 
 export interface CreateCourseDto {
   title: string;
   description: string;
-  thumbnail?: string;
+  shortDescription?: string;
+  categoryId?: string;
+  level?: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
   price?: number;
-  level: 'BEGINNER' | 'INTERMEDIATE' | 'ADVANCED';
-  language?: 'ENGLISH' | 'AMHARIC';
-  category: string;
-  status?: 'DRAFT' | 'PENDING' | 'PUBLISHED' | 'REJECTED';
-  sections?: CreateSectionDto[];
+  isFree?: boolean;
+  thumbnail?: string;
+  images?: string[];
+  tags?: string[];
+  language?: string;
 }
 
-export interface CreateSectionDto {
-  title: string;
-  description?: string;
-  order?: number;
-  lessons?: CreateLessonDto[];
-}
-
-export interface CreateLessonDto {
-  title: string;
-  description?: string;
-  type: 'VIDEO' | 'DOCUMENT' | 'BOTH';
-  videoUrl?: string;
-  documentUrl?: string;
-  duration?: string;
-  order?: number;
+export interface FilterCoursesDto {
+  search?: string;
+  categoryId?: string;
+  status?: string;
+  level?: string;
+  language?: string;
+  minPrice?: number;
+  maxPrice?: number;
+  isFree?: boolean;
+  page?: number;
+  limit?: number;
+  sortBy?: string;
+  sortOrder?: 'ASC' | 'DESC';
 }
 
 export const coursesApi = {
-  // Get all courses
-  getAll: async (filters?: {
-    status?: string;
-    category?: string;
-    level?: string;
-    search?: string;
-  }): Promise<Course[]> => {
-    const params = new URLSearchParams();
-    if (filters?.status) params.append('status', filters.status);
-    if (filters?.category) params.append('category', filters.category);
-    if (filters?.level) params.append('level', filters.level);
-    if (filters?.search) params.append('search', filters.search);
-
-    const query = params.toString();
-    return apiClient.get<Course[]>(`/courses${query ? `?${query}` : ''}`);
+  getAll: async (filters?: FilterCoursesDto) => {
+    console.log('🔍 coursesApi.getAll called with filters:', filters);
+    console.log('🔍 coursesApi.getAll - baseURL:', apiClient.instance.defaults.baseURL);
+    console.log('🔍 coursesApi.getAll - full URL will be:', `${apiClient.instance.defaults.baseURL}/courses`);
+    
+    try {
+      const response = await apiClient.instance.get<{ courses: Course[]; total: number }>('/courses', {
+        params: filters,
+      });
+      
+      console.log('✅ coursesApi.getAll response:', {
+        status: response.status,
+        data: response.data,
+        coursesCount: response.data?.courses?.length || 0,
+        total: response.data?.total || 0,
+      });
+      
+      return response.data;
+    } catch (error: any) {
+      console.error('❌ coursesApi.getAll error:', {
+        message: error.message,
+        response: error.response?.data,
+        status: error.response?.status,
+        url: error.config?.url,
+      });
+      throw error;
+    }
   },
 
-  // Get single course
-  getById: async (id: string): Promise<Course> => {
-    return apiClient.get<Course>(`/courses/${id}`);
+  getById: async (id: string) => {
+    const response = await apiClient.instance.get<Course>(`/courses/${id}`);
+    return response.data;
   },
 
-  // Get my courses (creator)
-  getMyCourses: async (): Promise<Course[]> => {
-    return apiClient.get<Course[]>('/courses/my-courses');
+  create: async (data: CreateCourseDto) => {
+    const response = await apiClient.instance.post<Course>('/courses', data);
+    return response.data;
   },
 
-  // Get enrolled courses
-  getEnrolled: async (): Promise<Enrollment[]> => {
-    return apiClient.get<Enrollment[]>('/courses/enrolled');
+  update: async (id: string, data: Partial<CreateCourseDto>) => {
+    const response = await apiClient.instance.put<Course>(`/courses/${id}`, data);
+    return response.data;
   },
 
-  // Create course
-  create: async (data: CreateCourseDto): Promise<Course> => {
-    return apiClient.post<Course>('/courses', data);
+  delete: async (id: string) => {
+    await apiClient.instance.delete(`/courses/${id}`);
   },
 
-  // Update course
-  update: async (id: string, data: Partial<CreateCourseDto>): Promise<Course> => {
-    return apiClient.patch<Course>(`/courses/${id}`, data);
+  submitForReview: async (id: string) => {
+    const response = await apiClient.instance.post<Course>(`/courses/${id}/submit`);
+    return response.data;
   },
 
-  // Delete course
-  delete: async (id: string): Promise<void> => {
-    return apiClient.delete<void>(`/courses/${id}`);
+  enroll: async (id: string) => {
+    const response = await apiClient.instance.post(`/courses/${id}/enroll`);
+    return response.data;
   },
 
-  // Enroll in course
-  enroll: async (courseId: string): Promise<Enrollment> => {
-    return apiClient.post<Enrollment>(`/courses/${courseId}/enroll`, {});
+  getMyCourses: async () => {
+    const response = await apiClient.instance.get<Course[]>('/courses/my-courses');
+    return response.data;
   },
 
-  // Update progress
-  updateProgress: async (
-    courseId: string,
-    progress: number,
-    completed?: boolean,
-  ): Promise<Enrollment> => {
-    return apiClient.patch<Enrollment>(`/courses/${courseId}/progress`, {
-      progress,
-      completed,
+  getCourseLessons: async (id: string) => {
+    const response = await apiClient.instance.get<Lesson[]>(`/courses/${id}/lessons`);
+    return response.data;
+  },
+
+  getCourseProgress: async (id: string) => {
+    const response = await apiClient.instance.get(`/courses/${id}/progress`);
+    return response.data;
+  },
+
+  publish: async (id: string) => {
+    const response = await apiClient.instance.post<Course>(`/courses/${id}/publish`);
+    return response.data;
+  },
+
+  reject: async (id: string, rejectionReason: string) => {
+    const response = await apiClient.instance.post<Course>(`/courses/${id}/reject`, {
+      rejectionReason,
     });
+    return response.data;
   },
 };
 

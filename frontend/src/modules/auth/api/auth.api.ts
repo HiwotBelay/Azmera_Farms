@@ -1,6 +1,11 @@
-import { apiClient } from '@/lib/api';
+import { apiClient } from '@/lib/api-client';
 
-export interface RegisterDto {
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+
+export interface RegisterRequest {
   email: string;
   password: string;
   firstName?: string;
@@ -8,61 +13,84 @@ export interface RegisterDto {
   role: 'LEARNER' | 'CREATOR' | 'ADMIN';
 }
 
-export interface LoginDto {
-  email: string;
-  password: string;
-}
-
 export interface AuthResponse {
-  accessToken?: string;
-  access_token?: string;
-  refreshToken?: string;
-  refresh_token?: string;
   user: {
     id: string;
     email: string;
     firstName?: string;
     lastName?: string;
     role: string;
+    isEmailVerified?: boolean;
+    isActive?: boolean;
   };
+  accessToken: string;
+  refreshToken: string;
 }
 
 export const authApi = {
-  register: async (data: RegisterDto): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/register', data);
-    const token = response.accessToken || response.access_token;
-    if (token) apiClient.setToken(token);
-    return response;
+  login: async (data: LoginRequest): Promise<AuthResponse> => {
+    const response = await apiClient.instance.post<AuthResponse>('/auth/login', data);
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    apiClient.setTokensPublic(accessToken, refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    return response.data;
   },
 
-  login: async (data: LoginDto): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/login', data);
-    const token = response.accessToken || response.access_token;
-    if (token) apiClient.setToken(token);
-    return response;
+  register: async (data: RegisterRequest): Promise<AuthResponse> => {
+    const response = await apiClient.instance.post<AuthResponse>('/auth/register', {
+      email: data.email,
+      password: data.password,
+      firstName: data.firstName,
+      lastName: data.lastName,
+      role: data.role,
+    });
+    
+    const { accessToken, refreshToken, user } = response.data;
+    
+    // Store tokens
+    apiClient.setTokensPublic(accessToken, refreshToken);
+    localStorage.setItem('user', JSON.stringify(user));
+    
+    return response.data;
   },
 
   logout: async (): Promise<void> => {
-    await apiClient.post('/auth/logout', {});
-    apiClient.setToken(null);
+    const refreshToken = localStorage.getItem('refreshToken');
+    try {
+      await apiClient.instance.post('/auth/logout', { refreshToken });
+    } catch (error) {
+      console.error('Logout error:', error);
+    } finally {
+      apiClient.clearTokensPublic();
+    }
   },
 
-  refreshToken: async (refreshToken: string): Promise<AuthResponse> => {
-    const response = await apiClient.post<AuthResponse>('/auth/refresh', {
+  getMe: async (): Promise<AuthResponse['user']> => {
+    const response = await apiClient.instance.get<AuthResponse['user']>('/auth/me');
+    localStorage.setItem('user', JSON.stringify(response.data));
+    return response.data;
+  },
+
+  forgotPassword: async (email: string): Promise<void> => {
+    await apiClient.instance.post('/auth/forgot-password', { email });
+  },
+
+  resetPassword: async (token: string, newPassword: string): Promise<void> => {
+    await apiClient.instance.post('/auth/reset-password', {
+      token,
+      newPassword,
+    });
+  },
+
+  refreshToken: async (refreshToken: string): Promise<{ accessToken: string; refreshToken: string }> => {
+    const response = await apiClient.instance.post<{ accessToken: string; refreshToken: string }>('/auth/refresh', {
       refreshToken,
     });
-    apiClient.setToken(response.access_token);
-    return response;
-  },
-
-  forgotPassword: async (email: string): Promise<{ message: string }> => {
-    return apiClient.post('/auth/forgot-password', { email });
-  },
-
-  resetPassword: async (
-    token: string,
-    password: string,
-  ): Promise<{ message: string }> => {
-    return apiClient.post('/auth/reset-password', { token, password });
+    
+    apiClient.setTokensPublic(response.data.accessToken, response.data.refreshToken);
+    return response.data;
   },
 };

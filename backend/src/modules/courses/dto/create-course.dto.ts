@@ -1,103 +1,67 @@
 import {
   IsString,
-  IsNotEmpty,
-  IsNumber,
   IsOptional,
+  IsNumber,
+  IsBoolean,
   IsEnum,
   IsArray,
-  ValidateNested,
+  MinLength,
+  MaxLength,
   Min,
+  Max,
 } from 'class-validator';
-import { Type } from 'class-transformer';
-import { CourseLevel, CourseLanguage, CourseStatus } from '../entities/course.entity';
-import { LessonType } from '../entities/lesson.entity';
-
-export class CreateSectionDto {
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsNumber()
-  @IsOptional()
-  order?: number;
-
-  @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateLessonDto)
-  @IsOptional()
-  lessons?: CreateLessonDto[];
-}
-
-export class CreateLessonDto {
-  @IsString()
-  @IsNotEmpty()
-  title: string;
-
-  @IsString()
-  @IsOptional()
-  description?: string;
-
-  @IsEnum(LessonType)
-  type: LessonType;
-
-  @IsString()
-  @IsOptional()
-  videoUrl?: string;
-
-  @IsString()
-  @IsOptional()
-  documentUrl?: string;
-
-  @IsString()
-  @IsOptional()
-  duration?: string;
-
-  @IsNumber()
-  @IsOptional()
-  order?: number;
-}
+import { CourseLevel } from '../entities/course.entity';
 
 export class CreateCourseDto {
   @IsString()
-  @IsNotEmpty()
+  @MinLength(5, { message: 'Title must be at least 5 characters long' })
+  @MaxLength(200, { message: 'Title must not exceed 200 characters' })
   title: string;
 
   @IsString()
-  @IsNotEmpty()
+  @MinLength(50, { message: 'Description must be at least 50 characters long' })
   description: string;
+
+  @IsString()
+  @IsOptional()
+  @MaxLength(500, { message: 'Short description must not exceed 500 characters' })
+  shortDescription?: string;
+
+  @IsString()
+  @IsOptional()
+  categoryId?: string;
+
+  @IsEnum(CourseLevel, {
+    message: 'Level must be BEGINNER, INTERMEDIATE, or ADVANCED',
+  })
+  @IsOptional()
+  level?: CourseLevel;
+
+  @IsNumber()
+  @Min(0, { message: 'Price must be 0 or greater' })
+  @IsOptional()
+  price?: number;
+
+  @IsBoolean()
+  @IsOptional()
+  isFree?: boolean;
 
   @IsString()
   @IsOptional()
   thumbnail?: string;
 
-  @IsNumber()
-  @Min(0)
+  @IsArray()
+  @IsString({ each: true })
   @IsOptional()
-  price?: number;
-
-  @IsEnum(CourseLevel)
-  level: CourseLevel;
-
-  @IsEnum(CourseLanguage)
-  @IsOptional()
-  language?: CourseLanguage;
-
-  @IsString()
-  @IsNotEmpty()
-  category: string;
+  images?: string[];
 
   @IsArray()
-  @ValidateNested({ each: true })
-  @Type(() => CreateSectionDto)
+  @IsString({ each: true })
   @IsOptional()
-  sections?: CreateSectionDto[];
+  tags?: string[];
 
-  @IsEnum(CourseStatus)
+  @IsString()
   @IsOptional()
-  status?: CourseStatus;
+  language?: string; // 'en' or 'am'
 }
 

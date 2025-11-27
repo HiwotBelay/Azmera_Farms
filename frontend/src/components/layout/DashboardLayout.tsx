@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   BookOpen,
@@ -14,8 +14,9 @@ import {
   Menu,
   X,
   Bell,
+  LogOut,
 } from "lucide-react";
-import BackButton from "@/components/ui/BackButton";
+import { useAuth } from "@/modules/auth/hooks/useAuth";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;
@@ -34,6 +35,38 @@ const navigation = [
 export default function DashboardLayout({ children }: DashboardLayoutProps) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
+  const getUserInitials = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName[0]}${user.lastName[0]}`.toUpperCase();
+    }
+    if (user?.email) {
+      return user.email[0].toUpperCase();
+    }
+    return 'U';
+  };
+
+  const getUserDisplayName = () => {
+    if (user?.firstName && user?.lastName) {
+      return `${user.firstName} ${user.lastName}`;
+    }
+    if (user?.firstName) {
+      return user.firstName;
+    }
+    return user?.email || 'User';
+  };
+
+  const getUserRole = () => {
+    if (user?.role === 'CREATOR') return 'Creator';
+    if (user?.role === 'ADMIN') return 'Admin';
+    return 'Learner';
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -48,11 +81,11 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
           <div className="p-6 border-b">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-primary rounded-full flex items-center justify-center text-white font-bold">
-                JD
+                {getUserInitials()}
               </div>
-              <div>
-                <p className="font-semibold text-gray-800">John Doe</p>
-                <p className="text-sm text-gray-500">Student</p>
+              <div className="flex-1 min-w-0">
+                <p className="font-semibold text-gray-800 truncate">{getUserDisplayName()}</p>
+                <p className="text-sm text-gray-500">{getUserRole()}</p>
               </div>
             </div>
           </div>
@@ -77,6 +110,15 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
                 </Link>
               );
             })}
+            
+            {/* Logout Button */}
+            <button
+              onClick={handleLogout}
+              className="w-full flex items-center space-x-3 px-4 py-3 rounded-lg text-gray-700 hover:bg-gray-100 transition mt-4"
+            >
+              <LogOut className="w-5 h-5" />
+              <span className="font-medium">Logout</span>
+            </button>
           </nav>
         </div>
       </aside>
@@ -87,21 +129,12 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
         <header className="bg-white shadow-sm sticky top-0 z-40">
           <div className="px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setSidebarOpen(!sidebarOpen)}
-                  className="lg:hidden text-gray-500"
-                >
-                  {sidebarOpen ? (
-                    <X className="w-6 h-6" />
-                  ) : (
-                    <Menu className="w-6 h-6" />
-                  )}
-                </button>
-                {pathname !== "/dashboard" && (
-                  <BackButton fallbackPath="/dashboard" />
-                )}
-              </div>
+              <button
+                onClick={() => setSidebarOpen(!sidebarOpen)}
+                className="lg:hidden text-gray-500"
+              >
+                {sidebarOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              </button>
 
               <div className="flex items-center space-x-4 ml-auto">
                 <button className="relative p-2 text-gray-500 hover:text-gray-700">
@@ -127,3 +160,6 @@ export default function DashboardLayout({ children }: DashboardLayoutProps) {
     </div>
   );
 }
+
+
+

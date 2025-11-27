@@ -4,10 +4,14 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { User } from '../modules/auth/entities/user.entity';
 import { RefreshToken } from '../modules/auth/entities/refresh-token.entity';
 import { UserProfile } from '../modules/users/entities/user-profile.entity';
+import { CreatorApplication } from '../modules/admin/entities/creator-application.entity';
 import { Course } from '../modules/courses/entities/course.entity';
 import { Section } from '../modules/courses/entities/section.entity';
 import { Lesson } from '../modules/courses/entities/lesson.entity';
 import { Enrollment } from '../modules/courses/entities/enrollment.entity';
+import { Category } from '../modules/courses/entities/category.entity';
+import { LessonProgress } from '../modules/courses/entities/lesson-progress.entity';
+import { Media } from '../modules/media/entities/media.entity';
 
 @Module({
   imports: [
@@ -30,7 +34,19 @@ import { Enrollment } from '../modules/courses/entities/enrollment.entity';
               username: decodeURIComponent(url.username),
               password: decodeURIComponent(url.password),
               database: url.pathname.slice(1).split('?')[0], // Remove leading '/' and query params
-              entities: [User, RefreshToken, UserProfile, Course, Section, Lesson, Enrollment],
+              entities: [
+                User,
+                RefreshToken,
+                UserProfile,
+                CreatorApplication,
+                Course,
+                Section,
+                Lesson,
+                Enrollment,
+                Category,
+                LessonProgress,
+                Media,
+              ],
               synchronize: configService.get('NODE_ENV') === 'development',
               logging: configService.get('NODE_ENV') === 'development',
               ssl: params.get('sslmode') === 'require' || params.get('ssl') === 'true' ? {
@@ -47,7 +63,19 @@ import { Enrollment } from '../modules/courses/entities/enrollment.entity';
             return {
               type: 'postgres',
               url: databaseUrl,
-              entities: [User, RefreshToken, UserProfile, Course, Section, Lesson, Enrollment],
+              entities: [
+                User,
+                RefreshToken,
+                UserProfile,
+                CreatorApplication,
+                Course,
+                Section,
+                Lesson,
+                Enrollment,
+                Category,
+                LessonProgress,
+                Media,
+              ],
               synchronize: configService.get('NODE_ENV') === 'development',
               logging: configService.get('NODE_ENV') === 'development',
               ssl: {
@@ -69,7 +97,19 @@ import { Enrollment } from '../modules/courses/entities/enrollment.entity';
           username: configService.get('DB_USERNAME') || 'postgres',
           password: configService.get('DB_PASSWORD') || 'password',
           database: configService.get('DB_DATABASE') || 'azemera_academy',
-          entities: [User, RefreshToken, UserProfile, Course, Section, Lesson, Enrollment],
+          entities: [
+            User,
+            RefreshToken,
+            UserProfile,
+            CreatorApplication,
+            Course,
+            Section,
+            Lesson,
+            Enrollment,
+            Category,
+            LessonProgress,
+            Media,
+          ],
           synchronize: configService.get('NODE_ENV') === 'development',
           logging: configService.get('NODE_ENV') === 'development',
         };
