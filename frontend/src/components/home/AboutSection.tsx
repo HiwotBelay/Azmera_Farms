@@ -1,130 +1,120 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Users, BookOpen, Award, TrendingUp } from "lucide-react";
+import React from "react";
+import { Target, Lightbulb, Heart, ArrowRight } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
-// Stats will be translated in component
-
 export default function AboutSection() {
-  const { t, translationVersion } = useTranslation();
+  const { t } = useTranslation();
 
-  // Force re-render when translations change
-  useEffect(() => {
-    console.log(
-      `[AboutSection] Re-rendered, translation version: ${translationVersion}`
-    );
-  }, [translationVersion]);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          setIsVisible(true);
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const element = document.getElementById("about-section");
-    if (element) observer.observe(element);
-
-    return () => {
-      if (element) observer.unobserve(element);
-    };
-  }, []);
+  const features = [
+    {
+      icon: Target,
+      title: "Our Mission",
+      description:
+        "Empowering Ethiopian farmers with modern agricultural education to transform lives and communities.",
+    },
+    {
+      icon: Lightbulb,
+      title: "Our Vision",
+      description:
+        "Creating a future where every farmer has access to world-class agricultural knowledge and skills.",
+    },
+    {
+      icon: Heart,
+      title: "Our Values",
+      description:
+        "Dedicated to excellence, accessibility, and sustainable agricultural development across Ethiopia.",
+    },
+  ];
 
   return (
-    <section id="about-section" className="py-20 lg:py-28 bg-white">
-      <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20 max-w-7xl">
-        {/* About Azemera Section */}
-        <div className="text-center mb-16 lg:mb-20">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 text-gray-900">
-            {t("home.aboutTitle", "About")}{" "}
-            <span className="text-[#01BC63]">Azemera Academy</span>
-          </h2>
-          <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-3xl mx-auto">
-            {t(
-              "home.aboutDescription",
-              "Empowering Ethiopian farmers and agricultural professionals with modern, practical education to transform agriculture and improve livelihoods. We connect expert instructors with eager learners, creating a community where traditional farming wisdom meets modern agricultural techniques."
-            )}
-          </p>
-        </div>
+    <section
+      id="about"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-[#f8fffe] to-white py-20 md:py-32"
+    >
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-gradient-to-br from-[#01BC63]/10 to-transparent rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-gradient-to-tr from-[#FFDE59]/10 to-transparent rounded-full blur-3xl"></div>
+      </div>
 
-        {/* Interactive Stats Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 lg:mb-20">
-          {[
-            {
-              icon: Users,
-              value: "10,000+",
-              labelKey: "home.activeLearners",
-              label: "Active Learners",
-              color: "from-[#01BC63] to-[#01BC63]/80",
-            },
-            {
-              icon: BookOpen,
-              value: "500+",
-              labelKey: "home.expertCourses",
-              label: "Expert Courses",
-              color: "from-[#FFDE59] to-[#FFDE59]/80",
-            },
-            {
-              icon: Award,
-              value: "95%",
-              labelKey: "home.successRate",
-              label: "Success Rate",
-              color: "from-[#01BC63] to-[#FFDE59]",
-            },
-            {
-              icon: TrendingUp,
-              value: "50+",
-              labelKey: "home.expertInstructors",
-              label: "Expert Instructors",
-              color: "from-[#FFDE59] to-[#01BC63]",
-            },
-          ].map((stat, index) => {
-            const Icon = stat.icon;
-            return (
-              <div
-                key={index}
-                className={`group relative p-8 rounded-xl bg-gray-50 border border-gray-200 hover:border-[#01BC63] transition-all duration-300 hover:shadow-lg ${
-                  isVisible ? "animate-fade-in" : "opacity-0"
-                }`}
-                style={{ animationDelay: `${index * 100}ms` }}
-              >
-                <div className="text-center">
-                  <div
-                    className={`inline-flex p-4 rounded-lg bg-gradient-to-br ${stat.color} mb-4 group-hover:scale-110 transition-transform duration-300`}
-                  >
-                    <Icon className="w-7 h-7 text-white" />
-                  </div>
-                  <div
-                    className={`text-3xl md:text-4xl font-bold mb-2 bg-gradient-to-r ${stat.color} bg-clip-text text-transparent`}
-                  >
-                    {stat.value}
-                  </div>
-                  <p className="text-sm text-gray-600 font-medium">
-                    {t(stat.labelKey, stat.label)}
-                  </p>
-                </div>
-              </div>
-            );
-          })}
-        </div>
+      <div className="relative container mx-auto px-4 md:px-10 max-w-7xl">
+        <div className="grid md:grid-cols-2 gap-12 md:gap-16 items-center">
+          {/* Left Side - Content */}
+          <div className="space-y-8 z-10">
+            {/* Badge */}
+            <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#01BC63]/10 to-[#FFDE59]/10 backdrop-blur-sm border border-[#01BC63]/20 rounded-full px-5 py-2.5">
+              <div className="w-2 h-2 bg-[#01BC63] rounded-full animate-pulse"></div>
+              <span className="text-sm font-semibold text-[#01BC63]">
+                {t("home.aboutTitle", "About Us")}
+              </span>
+            </div>
 
-        {/* Our Mission Section */}
-        <div className="max-w-4xl mx-auto">
-          <div className="bg-gradient-to-br from-[#01BC63]/10 via-white to-[#FFDE59]/10 rounded-3xl p-10 lg:p-14 border-2 border-[#01BC63]/20 shadow-xl">
-            <h3 className="text-3xl md:text-4xl font-bold mb-6 text-gray-900 text-center">
-              {t("home.missionTitle", "Our Mission")}
-            </h3>
-            <p className="text-lg md:text-xl text-gray-700 leading-relaxed text-center">
+            {/* Title */}
+            <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold leading-tight">
+              <span className="text-gray-900">
+                {t("home.aboutTitle", "About")}
+              </span>{" "}
+              <span className="bg-gradient-to-r from-[#01BC63] to-[#FFDE59] bg-clip-text text-transparent">
+                Azemera Academy
+              </span>
+            </h2>
+
+            {/* Description */}
+            <p className="text-lg md:text-xl text-gray-700 leading-relaxed max-w-lg">
               {t(
-                "home.missionDescription",
-                "Azemera Academy is dedicated to bridging the knowledge gap in Ethiopian agriculture by providing accessible, high-quality online education. We believe that education is the key to sustainable agricultural development and food security for our nation."
+                "home.aboutDescription",
+                "Azemera Academy is dedicated to empowering Ethiopian farmers and agricultural professionals with cutting-edge knowledge and practical skills. We bridge the gap between traditional wisdom and modern techniques, creating a sustainable future for agriculture."
               )}
             </p>
+
+            {/* CTA Button */}
+            <div className="pt-4">
+              <a
+                href="#courses"
+                className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#01BC63] to-[#00a855] text-white rounded-xl font-semibold shadow-lg shadow-[#01BC63]/30 hover:shadow-xl hover:shadow-[#01BC63]/40 transition-all duration-300 hover:scale-105"
+              >
+                <span>Explore Our Courses</span>
+                <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </a>
+            </div>
+          </div>
+
+          {/* Right Side - Feature Cards */}
+          <div className="space-y-6 z-10">
+            {features.map((feature, index) => {
+              const Icon = feature.icon;
+              return (
+                <div
+                  key={index}
+                  className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-md overflow-hidden transition-all duration-500 hover:border-[#01BC63] hover:shadow-2xl hover:shadow-[#01BC63]/20"
+                >
+                  {/* Animated Gradient Background on Hover */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-[#01BC63] to-[#FFDE59] opacity-0 group-hover:opacity-5 transition-opacity duration-500"></div>
+
+                  {/* Animated Border Glow */}
+                  <div className="absolute inset-0 rounded-2xl bg-gradient-to-r from-[#01BC63] via-[#FFDE59] to-[#01BC63] opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10 blur-md scale-105"></div>
+
+                  <div className="flex items-start gap-4 relative z-10">
+                    {/* Icon */}
+                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-[#FFDE59] to-[#ffd633] flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-[#FFDE59]/40 transition-all duration-500 group-hover:scale-110 group-hover:rotate-3">
+                      <Icon className="w-7 h-7 text-gray-900 group-hover:scale-110 transition-transform duration-300" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1">
+                      <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-[#01BC63] transition-colors duration-300 group-hover:translate-x-1">
+                        {feature.title}
+                      </h3>
+                      <p className="text-gray-600 leading-relaxed group-hover:text-gray-700 transition-colors duration-300">
+                        {feature.description}
+                      </p>
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

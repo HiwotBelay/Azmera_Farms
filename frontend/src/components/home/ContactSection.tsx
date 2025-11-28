@@ -1,21 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Mail, Phone, MapPin, Send, MessageCircle, Clock } from "lucide-react";
+import React, { useState } from "react";
+import { Mail, Phone, MapPin, Send } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function ContactSection() {
-  const { t, translationVersion } = useTranslation();
-
-  useEffect(() => {
-    console.log(
-      `[ContactSection] Re-rendered, translation version: ${translationVersion}`
-    );
-  }, [translationVersion]);
+  const { t } = useTranslation();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
-    subject: "",
     message: "",
   });
 
@@ -27,182 +20,156 @@ export default function ContactSection() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission here
     console.log("Form submitted:", formData);
   };
 
   const contactInfo = [
     {
       icon: Mail,
-      titleKey: "home.contactEmail",
-      details: ["info@azemeraacademy.et", "support@azemeraacademy.et"],
-      color: "bg-[#01BC63]",
-      hoverColor: "hover:bg-[#059669]",
+      title: t("home.contactEmail", "Email"),
+      detail: "info@azemeraacademy.et",
     },
     {
       icon: Phone,
-      titleKey: "home.contactPhone",
-      details: ["+251 11 123 4567", "+251 911 234 567"],
-      color: "bg-[#FFDE59]",
-      hoverColor: "hover:bg-[#FFD700]",
+      title: t("home.contactPhone", "Phone"),
+      detail: "+251 11 123 4567",
     },
     {
       icon: MapPin,
-      titleKey: "home.contactVisit",
-      details: ["Azemera Farms", "Addis Ababa, Ethiopia"],
-      color: "bg-[#01BC63]",
-      hoverColor: "hover:bg-[#059669]",
+      title: t("home.contactVisit", "Address"),
+      detail: "Addis Ababa, Ethiopia",
     },
   ];
 
   return (
     <section
       id="contact"
-      className="py-20 lg:py-32 bg-gradient-to-br from-gray-50 via-white to-gray-50"
+      className="relative w-full min-h-screen flex items-center justify-center overflow-hidden bg-gradient-to-br from-white via-[#f8fffe] to-white pt-12 md:pt-16 pb-20 md:pb-32"
     >
-      <div className="container mx-auto px-6 md:px-12 lg:px-16 xl:px-20 max-w-7xl">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-1/4 right-0 w-96 h-96 bg-[#01BC63]/5 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-1/4 left-0 w-96 h-96 bg-[#FFDE59]/5 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative container mx-auto px-4 md:px-10 max-w-6xl z-10">
         {/* Header */}
-        <div className="text-center mb-16 lg:mb-24">
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 mb-6">
-            {t("home.contactTitle", "Get in")}{" "}
-            <span className="text-[#01BC63]">
+        <div className="text-center mb-12 md:mb-16">
+          <div className="inline-flex items-center gap-2 bg-gradient-to-r from-[#01BC63]/10 to-[#FFDE59]/10 backdrop-blur-sm border border-[#01BC63]/20 rounded-full px-5 py-2.5 mb-6">
+            <div className="w-2 h-2 bg-[#01BC63] rounded-full animate-pulse"></div>
+            <span className="text-sm font-semibold text-[#01BC63]">
+              Contact Us
+            </span>
+          </div>
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold mb-4">
+            <span className="text-gray-900">
+              {t("home.contactTitle", "Get in")}
+            </span>{" "}
+            <span className="bg-gradient-to-r from-[#01BC63] to-[#FFDE59] bg-clip-text text-transparent">
               {t("home.contactTitle2", "Touch")}
             </span>
           </h2>
-          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-lg md:text-xl text-gray-600 max-w-2xl mx-auto">
             {t(
               "home.contactDescription",
-              "Have questions? We'd love to hear from you. Send us a message and we'll respond as soon as possible."
+              "Have questions? We'd love to hear from you."
             )}
           </p>
         </div>
 
-        {/* Contact Cards Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16 lg:mb-20">
-          {contactInfo.map((info, index) => {
-            const Icon = info.icon;
-            return (
-              <div
-                key={index}
-                className="group bg-white rounded-2xl p-8 border border-gray-200 hover:border-[#01BC63] transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
-              >
+        <div className="grid md:grid-cols-2 gap-8 md:gap-12">
+          {/* Left Side - Contact Info Cards */}
+          <div className="space-y-6">
+            {contactInfo.map((info, index) => {
+              const Icon = info.icon;
+              return (
                 <div
-                  className={`inline-flex p-4 rounded-xl ${info.color} ${info.hoverColor} mb-6 transition-all duration-300 group-hover:scale-110`}
+                  key={index}
+                  className="group relative bg-white rounded-2xl p-6 border-2 border-gray-100 shadow-lg hover:shadow-2xl hover:shadow-[#01BC63]/20 transition-all duration-500 hover:-translate-y-2 hover:border-[#01BC63] overflow-hidden"
                 >
-                  <Icon className="w-6 h-6 text-white" />
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-4">
-                  {t(info.titleKey, info.titleKey)}
-                </h3>
-                <div className="space-y-2">
-                  {info.details.map((detail, idx) => (
-                    <p
-                      key={idx}
-                      className="text-gray-600 text-sm hover:text-[#01BC63] transition-colors cursor-pointer"
-                    >
-                      {detail}
-                    </p>
-                  ))}
-                </div>
-              </div>
-            );
-          })}
-        </div>
+                  {/* Animated Background */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-[#01BC63]/0 via-[#FFDE59]/0 to-[#01BC63]/0 group-hover:from-[#01BC63]/5 group-hover:via-[#FFDE59]/5 group-hover:to-[#01BC63]/5 transition-all duration-500"></div>
 
-        {/* Main Contact Form Section */}
-        <div className="max-w-5xl mx-auto">
-          <div className="bg-white rounded-3xl shadow-2xl border border-gray-200 overflow-hidden">
-            <div className="bg-gradient-to-r from-[#01BC63] to-[#059669] p-8 text-center">
-              <div className="inline-flex p-4 bg-white/20 rounded-full mb-4">
-                <MessageCircle className="w-8 h-8 text-white" />
-              </div>
-              <h3 className="text-3xl md:text-4xl font-bold text-white mb-2">
-                {t("home.sendMessage", "Send us a Message")}
-              </h3>
-              <p className="text-white/90 text-lg">
-                {t(
-                  "home.sendMessageDesc",
-                  "Fill out the form below and we'll get back to you within 24 hours"
-                )}
-              </p>
-            </div>
+                  {/* Corner Accent */}
+                  <div className="absolute top-0 right-0 w-20 h-20 bg-gradient-to-br from-[#01BC63]/0 to-[#FFDE59]/0 group-hover:from-[#01BC63]/20 group-hover:to-[#FFDE59]/20 rounded-bl-full transition-all duration-500"></div>
 
-            <form onSubmit={handleSubmit} className="p-8 lg:p-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <label
-                    htmlFor="name"
-                    className="block text-sm font-semibold text-gray-900 mb-3"
-                  >
-                    {t("home.contactFormName", "Full Name")}{" "}
-                    <span className="text-[#01BC63]">*</span>
-                  </label>
-                  <input
-                    type="text"
-                    id="name"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
-                    placeholder={t(
-                      "home.contactFormNamePlaceholder",
-                      "John Doe"
-                    )}
-                  />
+                  <div className="relative z-10 flex items-center gap-4">
+                    {/* Icon */}
+                    <div className="flex-shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-[#01BC63] to-[#00a855] flex items-center justify-center shadow-lg group-hover:shadow-xl group-hover:shadow-[#01BC63]/30 transition-all duration-500 group-hover:scale-110 group-hover:rotate-6">
+                      <Icon className="w-7 h-7 text-white" />
+                    </div>
+
+                    {/* Content */}
+                    <div className="flex-1">
+                      <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-[#01BC63] transition-colors duration-300">
+                        {info.title}
+                      </h3>
+                      <p className="text-gray-600 group-hover:text-gray-700 transition-colors duration-300">
+                        {info.detail}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Hover Border Glow */}
+                  <div className="absolute inset-0 rounded-2xl border-2 border-transparent group-hover:border-[#01BC63]/30 transition-all duration-500 pointer-events-none"></div>
                 </div>
+              );
+            })}
+          </div>
 
-                <div>
-                  <label
-                    htmlFor="email"
-                    className="block text-sm font-semibold text-gray-900 mb-3"
-                  >
-                    {t("home.contactFormEmail", "Email Address")}{" "}
-                    <span className="text-[#01BC63]">*</span>
-                  </label>
-                  <input
-                    type="email"
-                    id="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    required
-                    className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
-                    placeholder={t(
-                      "home.contactFormEmailPlaceholder",
-                      "john@example.com"
-                    )}
-                  />
-                </div>
-              </div>
-
-              <div className="mb-6">
+          {/* Right Side - Contact Form */}
+          <div className="bg-white rounded-2xl shadow-xl border-2 border-gray-100 p-8 overflow-hidden">
+            <form onSubmit={handleSubmit} className="space-y-5">
+              <div>
                 <label
-                  htmlFor="subject"
-                  className="block text-sm font-semibold text-gray-900 mb-3"
+                  htmlFor="name"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
                 >
-                  {t("home.contactFormSubject", "Subject")}{" "}
+                  {t("home.contactFormName", "Name")}{" "}
                   <span className="text-[#01BC63]">*</span>
                 </label>
                 <input
                   type="text"
-                  id="subject"
-                  name="subject"
-                  value={formData.subject}
+                  id="name"
+                  name="name"
+                  value={formData.name}
                   onChange={handleChange}
                   required
-                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 hover:border-gray-300"
                   placeholder={t(
-                    "home.contactFormSubjectPlaceholder",
-                    "What is this regarding?"
+                    "home.contactFormNamePlaceholder",
+                    "Your name"
                   )}
                 />
               </div>
 
-              <div className="mb-8">
+              <div>
+                <label
+                  htmlFor="email"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
+                >
+                  {t("home.contactFormEmail", "Email")}{" "}
+                  <span className="text-[#01BC63]">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  name="email"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 hover:border-gray-300"
+                  placeholder={t(
+                    "home.contactFormEmailPlaceholder",
+                    "your@email.com"
+                  )}
+                />
+              </div>
+
+              <div>
                 <label
                   htmlFor="message"
-                  className="block text-sm font-semibold text-gray-900 mb-3"
+                  className="block text-sm font-semibold text-gray-900 mb-2"
                 >
                   {t("home.contactFormMessage", "Message")}{" "}
                   <span className="text-[#01BC63]">*</span>
@@ -213,33 +180,22 @@ export default function ContactSection() {
                   value={formData.message}
                   onChange={handleChange}
                   required
-                  rows={6}
-                  className="w-full px-5 py-4 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 resize-none bg-gray-50 hover:bg-white"
+                  rows={5}
+                  className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 resize-none hover:border-gray-300"
                   placeholder={t(
                     "home.contactFormMessagePlaceholder",
-                    "Tell us how we can help you..."
+                    "Your message..."
                   )}
                 ></textarea>
               </div>
 
-              <div className="flex items-center justify-between flex-wrap gap-4">
-                <div className="flex items-center gap-2 text-gray-600 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>
-                    {t(
-                      "home.contactResponseTime",
-                      "We typically respond within 24 hours"
-                    )}
-                  </span>
-                </div>
-                <button
-                  type="submit"
-                  className="group px-8 py-4 bg-gradient-to-r from-[#01BC63] to-[#059669] text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-[#01BC63]/30 transition-all duration-200 flex items-center justify-center gap-2 hover:scale-105"
-                >
-                  <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  {t("home.sendMessage", "Send Message")}
-                </button>
-              </div>
+              <button
+                type="submit"
+                className="group w-full px-6 py-4 bg-gradient-to-r from-[#01BC63] to-[#00a855] text-white rounded-xl font-semibold shadow-lg shadow-[#01BC63]/30 hover:shadow-xl hover:shadow-[#01BC63]/40 transition-all duration-300 hover:scale-105 flex items-center justify-center gap-2"
+              >
+                <Send className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                {t("home.sendMessage", "Send Message")}
+              </button>
             </form>
           </div>
         </div>

@@ -11,6 +11,8 @@ import {
   Mail,
   Lock,
   User,
+  ArrowRight,
+  Check,
 } from "lucide-react";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -47,14 +49,14 @@ export default function UnifiedAuthForm() {
       value: "LEARNER" as UserRole,
       label: t("auth.learner", "Learner"),
       icon: GraduationCap,
-      color: "from-[#01BC63] to-[#059669]",
+      color: "from-[#01BC63] to-[#00a855]",
       bgColor: "bg-[#01BC63]",
     },
     {
       value: "CREATOR" as UserRole,
       label: t("auth.creator", "Creator"),
       icon: Monitor,
-      color: "from-[#FFDE59] to-[#FFD700]",
+      color: "from-[#FFDE59] to-[#ffd633]",
       bgColor: "bg-[#FFDE59]",
     },
     {
@@ -146,60 +148,77 @@ export default function UnifiedAuthForm() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#01BC63]/10 via-white to-[#FFDE59]/10 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-xl overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-white via-[#f0fef9] to-[#e8fdf5] flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Elements */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-[#01BC63]/10 rounded-full blur-3xl"></div>
+        <div className="absolute bottom-0 left-0 w-96 h-96 bg-[#FFDE59]/10 rounded-full blur-3xl"></div>
+      </div>
+
+      <div className="relative z-10 bg-white rounded-3xl shadow-2xl w-full max-w-2xl overflow-hidden border-2 border-gray-100">
         {/* Header with gradient */}
-        <div className="bg-gradient-to-r from-[#01BC63] to-[#059669] p-6 text-center">
-          <h1 className="text-2xl md:text-3xl font-bold text-white mb-1">
-            {mode === "login"
-              ? t("auth.loginTitle", "Welcome Back")
-              : t("auth.registerTitle", "Join Azemera")}
-          </h1>
-          <p className="text-white/90 text-sm md:text-base">
-            {mode === "login"
-              ? t(
-                  "auth.loginSubtitle",
-                  "Login to continue your learning journey"
-                )
-              : t(
-                  "auth.registerSubtitle",
-                  "Create your account to get started"
-                )}
-          </p>
+        <div className="relative bg-gradient-to-r from-[#01BC63] to-[#00a855] p-8 md:p-10 text-center overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-r from-[#01BC63]/20 to-[#FFDE59]/20"></div>
+          <div className="relative z-10">
+            <h1 className="text-3xl md:text-4xl font-extrabold text-white mb-2">
+              {mode === "login"
+                ? t("auth.loginTitle", "Welcome Back")
+                : t("auth.registerTitle", "Join Azemera")}
+            </h1>
+            <p className="text-white/90 text-base md:text-lg">
+              {mode === "login"
+                ? t(
+                    "auth.loginSubtitle",
+                    "Login to continue your learning journey"
+                  )
+                : t(
+                    "auth.registerSubtitle",
+                    "Create your account to get started"
+                  )}
+            </p>
+          </div>
         </div>
 
         {/* Mode Toggle */}
-        <div className="flex border-b border-gray-200">
+        <div className="flex border-b-2 border-gray-100 bg-gray-50/50">
           <button
             onClick={() => setMode("login")}
-            className={`flex-1 py-3 font-semibold transition-all duration-200 ${
+            className={`group flex-1 py-4 font-semibold transition-all duration-300 relative ${
               mode === "login"
-                ? "text-[#01BC63] border-b-2 border-[#01BC63]"
+                ? "text-[#01BC63]"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {t("common.login", "Login")}
+            <span className="relative z-10">{t("common.login", "Login")}</span>
+            {mode === "login" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#01BC63] to-[#00a855]"></div>
+            )}
           </button>
           <button
             onClick={() => setMode("signup")}
-            className={`flex-1 py-3 font-semibold transition-all duration-200 ${
+            className={`group flex-1 py-4 font-semibold transition-all duration-300 relative ${
               mode === "signup"
-                ? "text-[#01BC63] border-b-2 border-[#01BC63]"
+                ? "text-[#01BC63]"
                 : "text-gray-500 hover:text-gray-700"
             }`}
           >
-            {t("common.signUp", "Sign Up")}
+            <span className="relative z-10">
+              {t("common.signUp", "Sign Up")}
+            </span>
+            {mode === "signup" && (
+              <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-[#01BC63] to-[#00a855]"></div>
+            )}
           </button>
         </div>
 
-        <div className="p-6 md:p-8">
+        <div className="p-6 md:p-8 lg:p-10">
           {/* Role Selection (only for signup) */}
           {mode === "signup" && (
-            <div className="mb-5">
-              <label className="block text-sm font-semibold text-gray-900 mb-2">
+            <div className="mb-6">
+              <label className="block text-sm font-bold text-gray-900 mb-4">
                 {t("auth.selectRole", "Select Your Role")}
               </label>
-              <div className="grid grid-cols-3 gap-2 md:gap-3">
+              <div className="grid grid-cols-3 gap-3">
                 {roles.map((role) => {
                   const Icon = role.icon;
                   const isSelected = selectedRole === role.value;
@@ -208,16 +227,37 @@ export default function UnifiedAuthForm() {
                       key={role.value}
                       type="button"
                       onClick={() => setSelectedRole(role.value)}
-                      className={`p-3 md:p-4 rounded-xl border-2 transition-all duration-200 ${
+                      className={`group relative p-4 rounded-xl border-2 transition-all duration-300 overflow-hidden ${
                         isSelected
-                          ? `border-[#01BC63] bg-gradient-to-br ${role.color} text-white shadow-lg scale-105`
-                          : "border-gray-200 bg-gray-50 text-gray-700 hover:border-gray-300"
+                          ? `border-[#01BC63] shadow-lg shadow-[#01BC63]/20 scale-105`
+                          : "border-gray-200 bg-white hover:border-gray-300 hover:shadow-md"
                       }`}
                     >
-                      <Icon className="w-4 h-4 md:w-5 md:h-5 mx-auto mb-1 md:mb-2" />
-                      <span className="text-xs font-semibold block">
-                        {role.label}
-                      </span>
+                      {/* Gradient Background on Selected */}
+                      {isSelected && (
+                        <div
+                          className={`absolute inset-0 bg-gradient-to-br ${role.color} opacity-10`}
+                        ></div>
+                      )}
+                      <div className="relative z-10">
+                        <div
+                          className={`w-12 h-12 rounded-xl bg-gradient-to-br ${role.color} flex items-center justify-center mx-auto mb-3 shadow-lg group-hover:scale-110 transition-transform duration-300`}
+                        >
+                          <Icon className="w-6 h-6 text-white" />
+                        </div>
+                        <span
+                          className={`text-xs font-bold block ${
+                            isSelected ? "text-[#01BC63]" : "text-gray-700"
+                          }`}
+                        >
+                          {role.label}
+                        </span>
+                        {isSelected && (
+                          <div className="absolute top-2 right-2 w-5 h-5 bg-[#01BC63] rounded-full flex items-center justify-center">
+                            <Check className="w-3 h-3 text-white" />
+                          </div>
+                        )}
+                      </div>
                     </button>
                   );
                 })}
@@ -226,18 +266,18 @@ export default function UnifiedAuthForm() {
           )}
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* Full Name (only for signup) */}
             {mode === "signup" && (
               <div>
                 <label
                   htmlFor="fullName"
-                  className="block text-sm font-semibold text-gray-900 mb-2"
+                  className="block text-sm font-bold text-gray-900 mb-2"
                 >
                   {t("auth.fullName", "Full Name")}
                 </label>
-                <div className="relative">
-                  <User className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                <div className="relative group">
+                  <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#01BC63] transition-colors" />
                   <input
                     type="text"
                     id="fullName"
@@ -245,7 +285,7 @@ export default function UnifiedAuthForm() {
                     value={formData.fullName}
                     onChange={handleChange}
                     placeholder="John Doe"
-                    className="w-full pl-10 pr-4 py-2.5 md:py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
+                    className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white hover:border-gray-300"
                     required
                   />
                 </div>
@@ -256,12 +296,12 @@ export default function UnifiedAuthForm() {
             <div>
               <label
                 htmlFor="email"
-                className="block text-sm font-semibold text-gray-900 mb-2"
+                className="block text-sm font-bold text-gray-900 mb-2"
               >
                 {t("auth.email", "Email Address")}
               </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#01BC63] transition-colors" />
                 <input
                   type="email"
                   id="email"
@@ -269,7 +309,7 @@ export default function UnifiedAuthForm() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="your@email.com"
-                  className="w-full pl-10 pr-4 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
+                  className="w-full pl-12 pr-4 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white hover:border-gray-300"
                   required
                 />
               </div>
@@ -279,12 +319,12 @@ export default function UnifiedAuthForm() {
             <div>
               <label
                 htmlFor="password"
-                className="block text-sm font-semibold text-gray-900 mb-2"
+                className="block text-sm font-bold text-gray-900 mb-2"
               >
                 {t("auth.password", "Password")}
               </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+              <div className="relative group">
+                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-[#01BC63] transition-colors" />
                 <input
                   type={showPassword ? "text" : "password"}
                   id="password"
@@ -292,14 +332,14 @@ export default function UnifiedAuthForm() {
                   value={formData.password}
                   onChange={handleChange}
                   placeholder="••••••••"
-                  className="w-full pl-10 pr-12 py-3 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white"
+                  className="w-full pl-12 pr-12 py-3.5 border-2 border-gray-200 rounded-xl focus:ring-2 focus:ring-[#01BC63] focus:border-[#01BC63] outline-none transition-all duration-200 bg-gray-50 hover:bg-white hover:border-gray-300"
                   required
                   minLength={8}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-[#01BC63] transition-colors"
                 >
                   {showPassword ? (
                     <EyeOff className="w-5 h-5" />
@@ -309,7 +349,7 @@ export default function UnifiedAuthForm() {
                 </button>
               </div>
               {mode === "signup" && (
-                <p className="mt-1 text-xs text-gray-500">
+                <p className="mt-2 text-xs text-gray-500">
                   Must be at least 8 characters with uppercase, lowercase, and
                   number
                 </p>
@@ -319,21 +359,21 @@ export default function UnifiedAuthForm() {
             {/* Remember Me / Forgot Password (only for login) */}
             {mode === "login" && (
               <div className="flex items-center justify-between">
-                <label className="flex items-center cursor-pointer">
+                <label className="flex items-center cursor-pointer group">
                   <input
                     type="checkbox"
                     name="rememberMe"
                     checked={formData.rememberMe}
                     onChange={handleChange}
-                    className="w-4 h-4 text-[#01BC63] border-gray-300 rounded focus:ring-[#01BC63]"
+                    className="w-5 h-5 text-[#01BC63] border-gray-300 rounded focus:ring-2 focus:ring-[#01BC63] cursor-pointer"
                   />
-                  <span className="ml-2 text-sm text-gray-700">
+                  <span className="ml-2 text-sm text-gray-700 group-hover:text-gray-900 transition-colors">
                     {t("auth.rememberMe", "Remember me")}
                   </span>
                 </label>
                 <a
                   href="/forgot-password"
-                  className="text-sm text-[#01BC63] hover:underline font-medium"
+                  className="text-sm text-[#01BC63] hover:text-[#00a855] hover:underline font-semibold transition-colors"
                 >
                   {t("auth.forgotPassword", "Forgot password?")}
                 </a>
@@ -349,12 +389,12 @@ export default function UnifiedAuthForm() {
                   name="agreeToTerms"
                   checked={formData.agreeToTerms}
                   onChange={handleChange}
-                  className="w-4 h-4 text-[#01BC63] border-gray-300 rounded focus:ring-[#01BC63] mt-1"
+                  className="w-5 h-5 text-[#01BC63] border-gray-300 rounded focus:ring-2 focus:ring-[#01BC63] mt-0.5 cursor-pointer"
                   required
                 />
                 <label
                   htmlFor="agreeToTerms"
-                  className="ml-2 text-sm text-gray-700 cursor-pointer"
+                  className="ml-3 text-sm text-gray-700 cursor-pointer hover:text-gray-900 transition-colors"
                 >
                   {t(
                     "auth.agreeToTerms",
@@ -370,22 +410,26 @@ export default function UnifiedAuthForm() {
               disabled={
                 isLoading || (mode === "signup" && !formData.agreeToTerms)
               }
-              className="w-full py-3 md:py-4 bg-gradient-to-r from-[#01BC63] to-[#059669] text-white rounded-xl font-semibold hover:shadow-xl hover:shadow-[#01BC63]/30 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="group relative w-full py-4 bg-gradient-to-r from-[#01BC63] to-[#00a855] text-white rounded-xl font-bold shadow-lg shadow-[#01BC63]/30 hover:shadow-xl hover:shadow-[#01BC63]/40 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-lg disabled:hover:shadow-[#01BC63]/30 overflow-hidden"
             >
-              {isLoading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  {mode === "login"
-                    ? t("common.loading", "Logging in...")
-                    : t("common.loading", "Creating account...")}
-                </>
-              ) : (
-                <>
-                  {mode === "login"
-                    ? t("common.login", "Login")
-                    : t("common.register", "Create Account")}
-                </>
-              )}
+              <span className="absolute inset-0 bg-gradient-to-r from-[#00a855] to-[#01BC63] opacity-0 group-hover:opacity-100 transition-opacity duration-300"></span>
+              <span className="relative z-10 flex items-center justify-center gap-2">
+                {isLoading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    {mode === "login"
+                      ? t("common.loading", "Logging in...")
+                      : t("common.loading", "Creating account...")}
+                  </>
+                ) : (
+                  <>
+                    {mode === "login"
+                      ? t("common.login", "Login")
+                      : t("common.register", "Create Account")}
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                  </>
+                )}
+              </span>
             </button>
           </form>
         </div>
